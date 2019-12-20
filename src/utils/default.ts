@@ -16,9 +16,11 @@ export abstract class Default {
     public static readonly LOGO_URI: string = 'https://i.imgur.com/O7PxGWQ.png'
 
     // MongoDB
+    public static readonly INFLUXDB_URI: string = 'http://127.0.0.1:8086/timeseries'
+    public static readonly INFLUXDB_URI_TEST: string = 'http://127.0.0.1:8086/timeseries-test'
 
     // RabbitMQ
-    public static readonly RABBITMQ_URI: string = 'amqp://guest:guest@127.0.0.1:5672/haniot'
+    public static readonly RABBITMQ_URI: string = 'amqp://guest:guest@127.0.0.1:5672'
 
     // Log
     public static readonly LOG_DIR: string = 'logs'

@@ -4,7 +4,6 @@ import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import HttpStatus from 'http-status-codes'
 import swaggerUi from 'swagger-ui-express'
-import qs from 'query-strings-parser'
 import express, { Application, NextFunction, Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
 import { InversifyExpressServer } from 'inversify-express-utils'
@@ -80,16 +79,6 @@ export class App {
             DIContainer, null, { rootPath: '/' })
 
         inversifyExpress.setConfig((app: Application) => {
-            // for handling query strings
-            // {@link https://www.npmjs.com/package/query-strings-parser}
-            app.use(qs({
-                use_page: true,
-                default: {
-                    pagination: { limit: 100 },
-                    sort: { created_at: 'desc' }
-                }
-            }))
-
             // helps you secure your Express apps by setting various HTTP headers.
             // {@link https://www.npmjs.com/package/helmet}
             app.use(helmet())

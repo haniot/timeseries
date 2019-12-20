@@ -11,6 +11,18 @@ import { IConnectionEventBus } from '../infrastructure/port/connection.event.bus
 import { ConnectionRabbitMQ } from '../infrastructure/eventbus/rabbitmq/connection.rabbitmq'
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
 import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
+import { ConnectionFactoryInfluxDB } from '../infrastructure/database/connection.factory.infludb'
+import { MyInfluxDB } from '../infrastructure/database/influx.db'
+import { IDatabase } from '../infrastructure/port/database.interface'
+import { ITimeSeriesService } from '../application/port/timeseries.service.interface'
+import { TimeSeriesService } from '../application/service/time.series.service'
+import { IIntradayTimeSeriesService } from '../application/port/intraday.time.series.service.interface'
+import { IntradayTimeSeriesService } from '../application/service/intraday.time.series.service'
+import { ITimeSeriesRepository } from '../application/port/timeseries.repository.interface'
+import { TimeSeriesRepository } from '../infrastructure/repository/time.series.repository'
+import { IIntradayTimeSeriesRepository } from '../application/port/intraday.time.series.repository.interface'
+import { IntradayTimeSeriesRepository } from '../infrastructure/repository/intraday.time.series.repository'
+import { TimeSeriesController } from '../ui/controller/timeseries'
 
 class IoC {
     private readonly _container: Container
@@ -41,14 +53,30 @@ class IoC {
         // Controllers
         this._container.bind<HomeController>(Identifier.HOME_CONTROLLER)
             .to(HomeController).inSingletonScope()
+        this._container.bind<TimeSeriesController>(Identifier.TIMESERIES_CONTROLLER)
+            .to(TimeSeriesController).inSingletonScope()
 
         // Services
+        this._container.bind<ITimeSeriesService>(Identifier.TIMESERIES_SERVICE)
+            .to(TimeSeriesService).inSingletonScope()
+        this._container.bind<IIntradayTimeSeriesService>(Identifier.INTRADAY_SERVICE)
+            .to(IntradayTimeSeriesService).inSingletonScope()
 
         // Repositories
+        this._container.bind<ITimeSeriesRepository>(Identifier.TIMESERIES_REPOSITORY)
+            .to(TimeSeriesRepository).inSingletonScope()
+        this._container.bind<IIntradayTimeSeriesRepository>(Identifier.INTRADAY_REPOSITORY)
+            .to(IntradayTimeSeriesRepository).inSingletonScope()
 
         // Mappers
 
         // Background Services
+        this._container
+            .bind<IConnectionFactory>(Identifier.INFLUXDB_CONNECTION_FACTORY)
+            .to(ConnectionFactoryInfluxDB).inSingletonScope()
+        this._container
+            .bind<IDatabase>(Identifier.INFLUXDB_CONNECTION)
+            .to(MyInfluxDB).inSingletonScope()
         this._container
             .bind<IConnectionFactory>(Identifier.RABBITMQ_CONNECTION_FACTORY)
             .to(ConnectionFactoryRabbitMQ).inSingletonScope()
