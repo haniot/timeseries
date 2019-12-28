@@ -1,4 +1,4 @@
-# HANIoT timeseries Service
+# HANIoT Timeseries Service
 [![License][license-image]][license-url] [![Node][node-image]][node-url] [![Travis][travis-image]][travis-url] [![Coverage][coverage-image]][coverage-url] [![Dependencies][dependencies-image]][dependencies-url] [![DependenciesDev][dependencies-dev-image]][dependencies-dev-url] [![Vulnerabilities][known-vulnerabilities-image]][known-vulnerabilities-url] [![Commit][last-commit-image]][last-commit-url] [![Releases][releases-image]][releases-url] [![Contributors][contributors-image]][contributors-url]  [![Swagger][swagger-image]][swagger-url] 
 
 ----
@@ -6,7 +6,7 @@
 Microservice responsible for time series on the HANIoT platform.
 
 **Main features:**
-- Timeseries:
+- Timeseries/Intraday:
   - steps, calories, distance, active_minutes and heart rate.
 - InfluxDB
 - Message Bus Integration (RabbitMQ).
@@ -25,15 +25,15 @@ Application settings are defined by environment variables.. To define the settin
 
 | VARIABLE | DESCRIPTION  | DEFAULT |
 |-----|-----|-----|
-| `NODE_ENV` | Defines the environment in which the application runs. You can set: `test` _(in this environment, the database defined in `MONGODB_URI_TEST` is used and the logs are disabled for better visualization of the test output)_, `development` _(in this environment, all log levels are enabled)_ and `production` _(in this environment, only the warning and error logs are enabled)_. | `development` |
+| `NODE_ENV` | Defines the environment in which the application runs. You can set: `test` _(in this environment, the database defined in `INFLUXDB_URI_TEST` is used and the logs are disabled for better visualization of the test output)_, `development` _(in this environment, all log levels are enabled)_ and `production` _(in this environment, only the warning and error logs are enabled)_. | `development` |
 | `PORT_HTTP` | Port used to listen for HTTP requests. Any request received on this port is redirected to the HTTPS port. | `4000` |
 | `PORT_HTTPS` | Port used to listen for HTTPS requests. Do not forget to provide the private key and the SSL/TLS certificate. See the topic [generate certificates](#generate-certificates). | `4001` |
 | `SSL_KEY_PATH` | SSL/TLS certificate private key. | `.certs/server.key` |
 | `SSL_CERT_PATH` | SSL/TLS certificate. | `.certs/server.crt` |
 | `RABBITMQ_URI` | URI containing the parameters for connection to the message channel RabbitMQ. The [URI specifications ](https://www.rabbitmq.com/uri-spec.html) defined by RabbitMQ are accepted. For example: `amqp://user:pass@host:port/vhost`. | `amqp://guest:guest`<br/>`@127.0.0.1:5672` |
 | `RABBITMQ_CA_PATH` | RabbitMQ CA file location. Must always be provided when using `amqps` protocol. | `.certs/ca.crt` |
-| `INFLUXDB_URI` | Database connection URI used if the application is running in development or production environment. The [URI specifications ](https://docs.mongodb.com/manual/reference/connection-string) defined by MongoDB are accepted. For example: `http://user:pass@127.0.0.1:8086/timeseries`. | `http://127.0.0.1:8086/timeseries` |
-| `INFLUXDB_URI_TEST` | Database connection URI used if the application is running in test environment. The [URI specifications ](https://docs.mongodb.com/manual/reference/connection-string) defined by MongoDB are accepted. For example: `http://user:pass@127.0.0.1:8086/timeseries`. | `http://127.0.0.1:8086/timeseries-test` |
+| `INFLUXDB_URI` | Database connection URI used if the application is running in development or production environment. For example: `http://user:pass@127.0.0.1:8086/timeseries`. | `http://127.0.0.1:8086/timeseries` |
+| `INFLUXDB_URI_TEST` | Database connection URI used if the application is running in test environment. For example: `http://user:pass@127.0.0.1:8086/timeseries`. | `http://127.0.0.1:8086/timeseries-test` |
 
 ## Generate Certificates
 For development and testing environments the easiest and fastest way is to generate your own self-signed certificates. These certificates can be used to encrypt data as well as certificates signed by a CA, but users will receive a warning that the certificate is not trusted for their computer or browser. Therefore, self-signed certificates should only be used in non-production environments, that is, development and testing environments. To do this, run the `create-self-signed-certs.sh` script in the root of the repository.
@@ -118,7 +118,7 @@ docker run --rm \
   -e INFLUXDB_URI="http://127.0.0.1:8086/timeseries" \
   haniot/timeseries-service
 ```
-If the MongoDB or RabbitMQ instance is in the host local, add the `--net=host` statement when creating the container, this will cause the docker container to communicate with its local host.
+If the InfluxDB or RabbitMQ instance is in the host local, add the `--net=host` statement when creating the container, this will cause the docker container to communicate with its local host.
 ```sh
 docker run --rm \
   --net=host \

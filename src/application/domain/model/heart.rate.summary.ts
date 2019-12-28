@@ -1,56 +1,56 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 
 export class HeartRateSummary implements IJSONSerializable {
-    private _fat_burn_total: number
-    private _cardio_total: number
-    private _peak_total: number
-    private _out_of_range_total: number
+    private _outOfRangeTotal: number
+    private _fatBurnTotal: number
+    private _cardioTotal: number
+    private _peakTotal: number
 
-    constructor(fat_burn_total: number, cardio_total: number, peak_total: number, out_of_range_total: number) {
-        this._fat_burn_total = fat_burn_total
-        this._cardio_total = cardio_total
-        this._peak_total = peak_total
-        this._out_of_range_total = out_of_range_total
+    constructor(outOfRangeTotal?: number, fatBurnTotal?: number, cardioTotal?: number, peakTotal?: number) {
+        this._outOfRangeTotal = outOfRangeTotal !== undefined ? outOfRangeTotal : 0
+        this._fatBurnTotal = fatBurnTotal !== undefined ? fatBurnTotal : 0
+        this._cardioTotal = cardioTotal !== undefined ? cardioTotal : 0
+        this._peakTotal = peakTotal !== undefined ? peakTotal : 0
     }
 
-    get fat_burn_total(): number {
-        return this._fat_burn_total
+    get fatBurnTotal(): number {
+        return this._fatBurnTotal
     }
 
-    set fat_burn_total(value: number) {
-        this._fat_burn_total = value
+    set fatBurnTotal(value: number) {
+        this._fatBurnTotal = value
     }
 
-    get cardio_total(): number {
-        return this._cardio_total
+    get cardioTotal(): number {
+        return this._cardioTotal
     }
 
-    set cardio_total(value: number) {
-        this._cardio_total = value
+    set cardioTotal(value: number) {
+        this._cardioTotal = value
     }
 
-    get peak_total(): number {
-        return this._peak_total
+    get peakTotal(): number {
+        return this._peakTotal
     }
 
-    set peak_total(value: number) {
-        this._peak_total = value
+    set peakTotal(value: number) {
+        this._peakTotal = value
     }
 
-    get out_of_range_total(): number {
-        return this._out_of_range_total
+    get outOfRangeTotal(): number {
+        return this._outOfRangeTotal
     }
 
-    set out_of_range_total(value: number) {
-        this._out_of_range_total = value
+    set outOfRangeTotal(value: number) {
+        this._outOfRangeTotal = value
     }
 
     public toJSON(): any {
         return {
-            fat_burn_total: this.fat_burn_total,
-            cardio_total: this.cardio_total,
-            peak_total: this.peak_total,
-            out_of_range_total: this.out_of_range_total
+            out_of_range_total: this.outOfRangeTotal,
+            fat_burn_total: this.fatBurnTotal,
+            cardio_total: this.cardioTotal,
+            peak_total: this.peakTotal
         }
     }
 }

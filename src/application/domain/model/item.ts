@@ -1,12 +1,13 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 
-export class Item implements IJSONSerializable {
+export class Item implements IJSONSerializable, IJSONDeserializable<Item> {
     private _date: string
     private _value: number
 
-    constructor(date: string, value: number) {
-        this._date = date
-        this._value = value
+    constructor(date?: string, value?: number) {
+        this._date = date ? date : ''
+        this._value = value !== undefined ? value : 0
     }
 
     get date(): string {
@@ -30,5 +31,13 @@ export class Item implements IJSONSerializable {
             date: this.date,
             value: this.value
         }
+    }
+
+    public fromJSON(json: any): Item {
+        if (!json) return this
+
+        if (json.date) this.date = json.date
+        if (json.value !== undefined) this.value = json.value
+        return this
     }
 }

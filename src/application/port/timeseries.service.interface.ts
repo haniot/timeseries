@@ -24,11 +24,11 @@ export interface ITimeSeriesService extends IService<TimeSeries> {
      * Retrieves the time series of a resource associated with a patient.
      *
      * @param patientId
-     * @param type
      * @param startDate
      * @param endDate
+     * @param type
      * @return {Promise<TimeSeries>}
      * @throws {ValidationException | RepositoryException}
      */
-    listByType(patientId: string, type: string, startDate: string, endDate: string): Promise<TimeSeries>
+    listByType(patientId: string, startDate: string, endDate: string, type: string): Promise<TimeSeries>
 }

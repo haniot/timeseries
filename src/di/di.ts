@@ -22,7 +22,11 @@ import { ITimeSeriesRepository } from '../application/port/timeseries.repository
 import { TimeSeriesRepository } from '../infrastructure/repository/time.series.repository'
 import { IIntradayTimeSeriesRepository } from '../application/port/intraday.time.series.repository.interface'
 import { IntradayTimeSeriesRepository } from '../infrastructure/repository/intraday.time.series.repository'
-import { TimeSeriesController } from '../ui/controller/timeseries'
+import { TimeSeriesController } from '../ui/controller/timeseries.controller'
+import { IEntityMapper } from '../infrastructure/port/entity.mapper.interface'
+import { TimeSeries } from '../application/domain/model/time.series'
+import { TimeSeriesEntity } from '../infrastructure/entity/time.series.entity'
+import { TimeSeriesEntityMapper } from '../infrastructure/entity/mapper/time.series.entity.mapper'
 
 class IoC {
     private readonly _container: Container
@@ -69,6 +73,9 @@ class IoC {
             .to(IntradayTimeSeriesRepository).inSingletonScope()
 
         // Mappers
+        this.container
+            .bind<IEntityMapper<TimeSeries, TimeSeriesEntity>>(Identifier.TIME_SERIES_ENTITY_MAPPER)
+            .to(TimeSeriesEntityMapper).inSingletonScope()
 
         // Background Services
         this._container

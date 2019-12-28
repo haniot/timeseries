@@ -9,9 +9,9 @@ import { EventBusException } from '../../../application/domain/exception/eventbu
 
 @injectable()
 export class EventBusRabbitMQ implements IEventBus {
-    private readonly RABBITMQ_QUEUE_NAME: string = 'timeseries.app'
-    private readonly RABBITMQ_RPC_QUEUE_NAME: string = 'timeseries.app.rpc'
-    private readonly RABBITMQ_RPC_EXCHANGE_NAME: string = 'timeseries.app.rpc'
+    private readonly RABBITMQ_QUEUE_NAME: string = 'timeseries'
+    private readonly RABBITMQ_RPC_QUEUE_NAME: string = 'timeseries.rpc'
+    private readonly RABBITMQ_RPC_EXCHANGE_NAME: string = 'timeseries.rpc'
     private _receiveFromYourself: boolean
     private _event_handlers: Map<string, IIntegrationEventHandler<IntegrationEvent<any>>>
     private _rpcServer!: any

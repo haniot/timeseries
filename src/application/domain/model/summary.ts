@@ -3,8 +3,8 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 export class Summary implements IJSONSerializable {
     private _total: number
 
-    constructor(total: number) {
-        this._total = total
+    constructor(total?: number) {
+        this._total = total !== undefined ? total : 0
     }
 
     get total(): number {

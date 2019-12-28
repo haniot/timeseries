@@ -4,6 +4,7 @@ import { ILogger } from '../../utils/custom.logger'
 import { IDatabase } from '../port/database.interface'
 import { IntradayTimeSeries } from '../../application/domain/model/intraday.time.series'
 import { IIntradayTimeSeriesRepository } from '../../application/port/intraday.time.series.repository.interface'
+import { heartRateTimeSeriesSchema } from '../database/schema/heart.rate.time.series.schema'
 
 /**
  * Implementation of the Time Series repository.
@@ -17,7 +18,7 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
         @inject(Identifier.LOGGER) private readonly _logger: ILogger
     ) {
         this._logger.info('tet')
-        this._db.connection
+        this._db.connection?.addSchema(heartRateTimeSeriesSchema)
     }
 
     public create(item: IntradayTimeSeries): Promise<IntradayTimeSeries> {

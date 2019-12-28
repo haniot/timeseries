@@ -1,17 +1,18 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { TimeSeries } from './time.series'
+import { TimeSeriesType } from '../utils/time.series.type'
 
 export class TimeSeriesGroup implements IJSONSerializable {
     private _steps: TimeSeries
     private _calories: TimeSeries
     private _distance: TimeSeries
-    private _active_minutes: TimeSeries
+    private _activeMinutes: TimeSeries
 
-    constructor(steps: TimeSeries, calories: TimeSeries, distance: TimeSeries, active_minutes: TimeSeries) {
-        this._steps = steps
-        this._calories = calories
-        this._distance = distance
-        this._active_minutes = active_minutes
+    constructor(steps?: TimeSeries, calories?: TimeSeries, distance?: TimeSeries, activeMinutes?: TimeSeries) {
+        this._steps = steps ? steps : new TimeSeries(TimeSeriesType.STEPS)
+        this._calories = calories ? calories : new TimeSeries(TimeSeriesType.CALORIES)
+        this._distance = distance ? distance : new TimeSeries(TimeSeriesType.DISTANCE)
+        this._activeMinutes = activeMinutes ? activeMinutes : new TimeSeries(TimeSeriesType.ACTIVE_MINUTES)
     }
 
     get steps(): TimeSeries {
@@ -38,12 +39,12 @@ export class TimeSeriesGroup implements IJSONSerializable {
         this._distance = value
     }
 
-    get active_minutes(): TimeSeries {
-        return this._active_minutes
+    get activeMinutes(): TimeSeries {
+        return this._activeMinutes
     }
 
-    set active_minutes(value: TimeSeries) {
-        this._active_minutes = value
+    set activeMinutes(value: TimeSeries) {
+        this._activeMinutes = value
     }
 
     public toJSON(): any {
@@ -51,7 +52,7 @@ export class TimeSeriesGroup implements IJSONSerializable {
             steps: this._steps.toJSON(),
             calories: this._calories.toJSON(),
             distance: this._distance.toJSON(),
-            active_minutes: this._active_minutes.toJSON()
+            active_minutes: this._activeMinutes.toJSON()
         }
     }
 }

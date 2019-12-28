@@ -33,8 +33,6 @@ export class App {
 
     /**
      * Get express instance.
-     *
-     * @return {Application}
      */
     public getExpress(): Application {
         return this.express
@@ -42,9 +40,6 @@ export class App {
 
     /**
      * Initialize app settings.
-     *
-     * @private
-     * @return void
      */
     private bootstrap(): void {
         this.initMiddleware()
@@ -52,29 +47,19 @@ export class App {
 
     /**
      * Initialize middleware.
-     *
-     * @private
-     * @return void
      */
-    private async initMiddleware(): Promise<void> {
-        try {
-            await this.setupInversifyExpress()
-            this.setupSwaggerUI()
-            this.setupErrorsHandler()
-        } catch (err) {
-            this._logger.error(`Fatal error in middleware configuration: ${(err && err.message) ? err.message : ''}`)
-        }
+    private initMiddleware(): void {
+        this.setupInversifyExpress()
+        this.setupSwaggerUI()
+        this.setupErrorsHandler()
     }
 
     /**
      * Setup Inversify.
-     * Responsible for injecting routes defined through annotations in controllers.
+     * Responsible for injecting routes defined through annotations in routes.
      * Other middleware are also injected, such as query-strings-parser, helmet, body-parser, morgan...
-     *
-     * @private
-     * @return Promise<void>
      */
-    private async setupInversifyExpress(): Promise<void> {
+    private setupInversifyExpress(): void {
         const inversifyExpress: InversifyExpressServer = new InversifyExpressServer(
             DIContainer, null, { rootPath: '/' })
 
@@ -94,10 +79,6 @@ export class App {
                     stream: { write: (str: string) => this._logger.info(str) }
                 }
             ))
-
-            // app.use((err, req, res, next) => {
-            //     next(err)
-            // })
         })
         this.express.use(inversifyExpress.build())
     }
@@ -130,8 +111,10 @@ export class App {
     private setupErrorsHandler(): void {
         // Handle 404
         this.express.use((req, res) => {
-            const errorMessage: ApiException = new ApiException(404, `${req.url} not found.`,
-                `Specified resource: ${req.url} was not found or does not exist.`)
+            const errorMessage: ApiException = new ApiException(
+                404,
+                Strings.ERROR_MESSAGE.ENDPOINT_NOT_FOUND.replace('{0}', req.url)
+            )
             res.status(HttpStatus.NOT_FOUND).send(errorMessage.toJson())
         })
 
@@ -142,9 +125,8 @@ export class App {
             if (err && err.statusCode === HttpStatus.BAD_REQUEST) {
                 statusCode = HttpStatus.BAD_REQUEST
                 errorMessage.code = statusCode
-                errorMessage.message = 'Unable to process request body.'
-                errorMessage.description = 'Please verify that the JSON provided in'
-                    .concat(' the request body has a valid format and try again.')
+                errorMessage.message = Strings.ERROR_MESSAGE.REQUEST_BODY_INVALID
+                errorMessage.description = Strings.ERROR_MESSAGE.REQUEST_BODY_INVALID_DESC
             }
             res.status(statusCode).send(errorMessage.toJson())
         })

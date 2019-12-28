@@ -1,28 +1,34 @@
-import { IJSONSerializable } from '../utils/json.serializable.interface'
-import { HeartRateItem } from './heart.rate.item'
 import { Item } from './item'
 import { Summary } from './summary'
+import { HeartRateItem } from './heart.rate.item'
 import { HeartRateSummary } from './heart.rate.summary'
+import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { JsonUtils } from '../utils/json.utils'
+import { TimeSeriesType } from '../utils/time.series.type'
 
-export class TimeSeries implements IJSONSerializable {
+export class TimeSeries implements IJSONSerializable, IJSONDeserializable<TimeSeries> {
     private _summary: Summary | HeartRateSummary
-    private _data_set: Array<Item | HeartRateItem>
+    private _dataSet: Array<Item | HeartRateItem>
     private _type: string // steps, calories, distance, active_minutes or heart_rate
-    private _patient_id?: string
+    private _patientId: string
 
-    constructor(summary: Summary | HeartRateSummary, type: string,
-                data_set: Array<Item | HeartRateItem>) {
-        this._data_set = data_set
-        this._summary = summary
-        this._type = type
+    constructor(type?: string,
+                summary?: Summary | HeartRateSummary,
+                dataSet?: Array<Item | HeartRateItem>,
+                patientId?: string) {
+        this._type = type ? type : ''
+        this._dataSet = dataSet ? dataSet : []
+        this._summary = summary ? summary : new Summary()
+        this._patientId = patientId ? patientId : ''
     }
 
-    get data_set(): Array<Item | HeartRateItem> {
-        return this._data_set
+    get dataSet(): Array<Item | HeartRateItem> {
+        return this._dataSet
     }
 
-    set data_set(value: Array<Item | HeartRateItem>) {
-        this._data_set = value
+    set dataSet(value: Array<Item | HeartRateItem>) {
+        this._dataSet = value
     }
 
     get summary(): Summary | HeartRateSummary {
@@ -41,18 +47,41 @@ export class TimeSeries implements IJSONSerializable {
         this._type = value
     }
 
-    get patient_id(): string | undefined {
-        return this._patient_id
+    get patientId(): string {
+        return this._patientId
     }
 
-    set patient_id(value: string | undefined) {
-        this._patient_id = value
+    set patientId(value: string) {
+        this._patientId = value
     }
 
     public toJSON(): any {
         return {
             summary: this.summary.toJSON(),
-            data_set: this.data_set.map(item => item.toJSON())
+            data_set: this.dataSet.map(item => item.toJSON())
         }
+    }
+
+    public fromJSON(json: any): TimeSeries {
+        if (!json) return this
+
+        if (JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
+
+        if (json.patient_id) this.patientId = json.patient_id
+        if (json.type) {
+            this.type = json.type
+
+            if (!(json.data_set instanceof Array)) return this
+
+            // build data set
+            if (this.type !== TimeSeriesType.HEART_RATE) {
+                this.dataSet = json.data_set.map(item => new Item().fromJSON(item))
+            } else {
+                this.dataSet = json.data_set.map(item => new HeartRateItem().fromJSON(item))
+            }
+        }
+        return this
     }
 }

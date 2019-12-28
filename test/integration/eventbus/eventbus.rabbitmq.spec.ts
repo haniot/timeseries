@@ -153,26 +153,6 @@ describe('EVENT BUS', () => {
             }
         })
 
-        it('should return a requested resource.', async () => {
-            try {
-                await eventBus.connectionRpcClient.open(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,
-                    { interval: 100, sslOptions: { ca: [] } })
-                await eventBus.provideResource('resource.test.get', (query: string) => {
-                    return { content: '123', original_query: query }
-                })
-
-                return eventBus.executeResource('timeseries.rpc',
-                    'resource.test.get',
-                    '?test=321')
-                    .then(res => {
-                        expect(res).to.have.property('content', '123')
-                        expect(res).to.have.property('original_query', '?test=321')
-                    })
-            } catch (err) {
-                throw new Error('Failure on EventBus test: ' + err.message)
-            }
-        })
-
         it('should return time out for a requested resource that is not being provided.', async () => {
             try {
                 await eventBus.connectionRpcClient.open(process.env.RABBITMQ_URI || Default.RABBITMQ_URI,

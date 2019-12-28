@@ -4,9 +4,11 @@ import { Identifier } from '../../di/identifiers'
 import { ITimeSeriesRepository } from '../port/timeseries.repository.interface'
 import { TimeSeries } from '../domain/model/time.series'
 import { TimeSeriesGroup } from '../domain/model/time.series.group'
+import { TimeSeriesListValidator } from '../domain/validator/time.series.list.validator'
+import { TimeSeriesType } from '../domain/utils/time.series.type'
 
 /**
- * Implementing Time Series Service.
+ * Implementation Time Series Service.
  *
  * @implements {ITimeSeriesService}
  */
@@ -19,12 +21,33 @@ export class TimeSeriesService implements ITimeSeriesService {
     ) {
     }
 
-    public listAll(patientId: string, startDate: string, endDate: string): Promise<TimeSeriesGroup> {
-        return this._timeSeriesRepository.listAll(patientId, startDate, endDate)
+    public async listAll(patientId: string, startDate: string, endDate: string): Promise<TimeSeriesGroup> {
+        try {
+            TimeSeriesListValidator.validate(patientId, startDate, endDate)
+            const timeSeriesGroup: TimeSeriesGroup = new TimeSeriesGroup()
+
+            timeSeriesGroup.steps = await this._timeSeriesRepository
+                .listByType(patientId, startDate, endDate, TimeSeriesType.STEPS)
+            timeSeriesGroup.calories = await this._timeSeriesRepository
+                .listByType(patientId, startDate, endDate, TimeSeriesType.CALORIES)
+            timeSeriesGroup.distance = await this._timeSeriesRepository
+                .listByType(patientId, startDate, endDate, TimeSeriesType.DISTANCE)
+            timeSeriesGroup.activeMinutes = await this._timeSeriesRepository
+                .listByType(patientId, startDate, endDate, TimeSeriesType.ACTIVE_MINUTES)
+
+            return Promise.resolve(timeSeriesGroup)
+        } catch (e) {
+            return Promise.reject(e)
+        }
     }
 
-    public listByType(patientId: string, type: string, startDate: string, endDate: string): Promise<TimeSeries> {
-        return this._timeSeriesRepository.listByType(patientId, type, startDate, endDate)
+    public listByType(patientId: string, startDate: string, endDate: string, type: string): Promise<TimeSeries> {
+        try {
+            TimeSeriesListValidator.validate(patientId, startDate, endDate, type)
+            return this._timeSeriesRepository.listByType(patientId, startDate, endDate, type)
+        } catch (e) {
+            return Promise.reject(e)
+        }
     }
 
     public add(item: TimeSeries): Promise<TimeSeries> {

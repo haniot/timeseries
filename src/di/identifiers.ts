@@ -20,9 +20,9 @@ export abstract class Identifier {
     public static readonly TIMESERIES_REPOSITORY: any = Symbol.for('TimeSeriesRepository')
     public static readonly INTRADAY_REPOSITORY: any = Symbol.for('IntradayRepository')
 
-    // Models
-
     // Mappers
+    public static readonly TIME_SERIES_ENTITY_MAPPER: any = Symbol.for('TimeSeriesEntityMapper')
+    public static readonly INTRADAY_ENTITY_MAPPER: any = Symbol.for('IntradayTimeSeriesEntityMapper')
 
     // Background Services
     public static readonly RABBITMQ_CONNECTION_FACTORY: any = Symbol.for('ConnectionFactoryRabbitMQ')

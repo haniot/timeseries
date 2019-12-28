@@ -5,7 +5,7 @@ import { IIntradayTimeSeriesService } from '../port/intraday.time.series.service
 import { IntradayTimeSeries } from '../domain/model/intraday.time.series'
 
 /**
- * Implementing Intraday ime Series Service.
+ * Implementation intraday time series service.
  *
  * @implements {ITimeSeriesService}
  */

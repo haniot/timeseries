@@ -1,16 +1,19 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 
-export class HeartRateZoneData implements IJSONSerializable {
+export class HeartRateZoneData implements IJSONSerializable, IJSONDeserializable<HeartRateZoneData> {
     private _min: number // Minimum value of the heart rate zone.
     private _max: number // Maximum value of the heart rate zone.
     private _duration?: number  // Duration in the heart rate zone (given in milliseconds).
     private _calories?: number
+    private _type?: string // Zone name
 
-    constructor(min: number, max: number, duration?: number, calories?: number) {
-        this._min = min
-        this._max = max
-        this._duration = duration
-        this._calories = calories
+    constructor(min?: number, max?: number, duration?: number, calories?: number, type?: string) {
+        this._min = min !== undefined ? min : 0
+        this._max = max !== undefined ? max : 0
+        this._duration = duration !== undefined ? duration : 0
+        this._calories = calories !== undefined ? calories : 0
+        this._type = type ? type : ''
     }
 
     get min(): number {
@@ -45,6 +48,14 @@ export class HeartRateZoneData implements IJSONSerializable {
         this._calories = value
     }
 
+    get type(): string | undefined {
+        return this._type
+    }
+
+    set type(value: string | undefined) {
+        this._type = value
+    }
+
     public toJSON(): any {
         return {
             min: this.min,
@@ -52,5 +63,16 @@ export class HeartRateZoneData implements IJSONSerializable {
             calories: this.calories,
             duration: this.duration
         }
+    }
+
+    public fromJSON(json: any): HeartRateZoneData {
+        if (!json) return this
+
+        if (json.min !== undefined) this.min = json.min
+        if (json.max !== undefined) this.max = json.max
+        if (json.duration !== undefined) this.duration = json.duration
+        if (json.calories !== undefined) this.calories = json.calories
+        if (json.name) this.type = json.name
+        return this
     }
 }
