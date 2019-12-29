@@ -4,7 +4,7 @@ import { Strings } from '../../../src/utils/strings'
 import { TimeSeriesListValidator } from '../../../src/application/domain/validator/time.series.list.validator'
 import { TimeSeriesType } from '../../../src/application/domain/utils/time.series.type'
 
-describe('Validators: TimeSeriesListValidator', () => {
+describe('VALIDATORS: TimeSeriesListValidator', () => {
     context('when parameters are invalid.', () => {
         context('start and end date.', () => {
             it('should throw ValidationException with message and invalid start date description.', () => {

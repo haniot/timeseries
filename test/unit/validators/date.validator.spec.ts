@@ -3,7 +3,7 @@ import { ValidationException } from '../../../src/application/domain/exception/v
 import { DateValidator } from '../../../src/application/domain/validator/date.validator'
 import { Strings } from '../../../src/utils/strings'
 
-describe('Validators: DateValidator', () => {
+describe('VALIDATORS: DateValidator', () => {
     context('when date is in invalid format.', () => {
         it('should throw ValidationException with date in invalid format 12-12-2019.', () => {
             try {

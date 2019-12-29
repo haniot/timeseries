@@ -3,7 +3,7 @@ import { ValidationException } from '../../../src/application/domain/exception/v
 import { Strings } from '../../../src/utils/strings'
 import { DateRangeValidator } from '../../../src/application/domain/validator/date.range.validator'
 
-describe('Validators: DateRangeValidator', () => {
+describe('VALIDATORS: DateRangeValidator', () => {
     context('when the date range is invalid.', () => {
         it('should throw ValidationException between dates 2019-12-16 and 2019-12-10.', () => {
             try {

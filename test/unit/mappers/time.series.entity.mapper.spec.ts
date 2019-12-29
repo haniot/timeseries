@@ -12,7 +12,7 @@ import { TimeSeriesDBMock } from '../../mocks/time.series.db.mock'
 import { Summary } from '../../../src/application/domain/model/summary'
 import { HeartRateItem } from '../../../src/application/domain/model/heart.rate.item'
 
-describe('Mappers: TimeSeriesEntityMapper', () => {
+describe('MAPPERS: TimeSeriesEntityMapper', () => {
     const mapper: IEntityMapper<TimeSeries, TimeSeriesEntity> = DIContainer.get(Identifier.TIME_SERIES_ENTITY_MAPPER)
 
     context('TRANSFORM TimeSeries object into TimeSeriesEntity.', () => {

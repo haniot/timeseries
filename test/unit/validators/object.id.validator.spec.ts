@@ -3,7 +3,7 @@ import { ObjectIdValidator } from '../../../src/application/domain/validator/obj
 import { ValidationException } from '../../../src/application/domain/exception/validation.exception'
 import { Strings } from '../../../src/utils/strings'
 
-describe('Validators: ObjectIdValidator', () => {
+describe('VALIDATORS: ObjectIdValidator', () => {
     context('when ObjectId is in invalid format', () => {
         it('should throw ValidationException with ObjectId in invalid format abc123.', () => {
             try {
