@@ -108,8 +108,8 @@ describe('MAPPERS: TimeSeriesEntityMapper', () => {
             assert.property(result, 'summary')
             assert.property(result, 'dataSet')
 
-            for (let i = 0; i < result.dataSet.length; i++) {
-                assert.property(result.dataSet[i], 'zones')
+            for (const item of result.dataSet) {
+                assert.property(item, 'zones')
             }
         })
 

@@ -91,15 +91,13 @@ export class App {
      */
     private setupSwaggerUI(): void {
         // Middleware swagger. It should not run in the test environment.
-        if ((process.env.NODE_ENV || Default.NODE_ENV) !== 'test') {
-            const options = {
-                swaggerUrl: Default.SWAGGER_URI,
-                customCss: '.swagger-ui .topbar { display: none }',
-                customfavIcon: Default.LOGO_URI,
-                customSiteTitle: `API Reference | ${Strings.APP.TITLE}`
-            }
-            this.express.use('/v1/reference', swaggerUi.serve, swaggerUi.setup({}, options))
+        const options = {
+            swaggerUrl: Default.SWAGGER_URI,
+            customCss: '.swagger-ui .topbar { display: none }',
+            customfavIcon: Default.LOGO_URI,
+            customSiteTitle: `API Reference | ${Strings.APP.TITLE}`
         }
+        this.express.use('/v1/reference', swaggerUi.serve, swaggerUi.setup({}, options))
     }
 
     /**
@@ -115,7 +113,7 @@ export class App {
                 404,
                 Strings.ERROR_MESSAGE.ENDPOINT_NOT_FOUND.replace('{0}', req.url)
             )
-            res.status(HttpStatus.NOT_FOUND).send(errorMessage.toJson())
+            res.status(HttpStatus.NOT_FOUND).send(errorMessage.toJSON())
         })
 
         // Handle 400, 500
@@ -128,7 +126,7 @@ export class App {
                 errorMessage.message = Strings.ERROR_MESSAGE.REQUEST_BODY_INVALID
                 errorMessage.description = Strings.ERROR_MESSAGE.REQUEST_BODY_INVALID_DESC
             }
-            res.status(statusCode).send(errorMessage.toJson())
+            res.status(statusCode).send(errorMessage.toJSON())
         })
     }
 }

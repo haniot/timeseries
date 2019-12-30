@@ -7,7 +7,7 @@ import { IIntradayTimeSeriesRepository } from '../../application/port/intraday.t
 import { heartRateTimeSeriesSchema } from '../database/schema/heart.rate.time.series.schema'
 
 /**
- * Implementation of the Time Series repository.
+ * Implementation of the Time Series infrastructure.
  *
  * @implements {ITimeSeriesRepository}
  */

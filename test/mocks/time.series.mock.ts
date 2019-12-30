@@ -12,7 +12,7 @@ import { TimeSeriesType } from '../../src/application/domain/utils/time.series.t
 export class TimeSeriesMock {
     public generate(startDate: string, endDate: string, type?: string): TimeSeries {
         if (!type) {
-            type = Object.values(TimeSeriesType)[Math.floor((Math.random() * 6))] // 0-5
+            type = Object.values(TimeSeriesType)[Math.floor((Math.random() * 5))] // 0-4
         }
 
         if (type !== TimeSeriesType.HEART_RATE) {
@@ -29,9 +29,9 @@ export class TimeSeriesMock {
 
         endDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD')
         for (const current = moment(startDate); current.isBefore(endDate); current.add(1, 'days')) {
-            let random = Math.floor((Math.random() * 20000 + 100)) // 100-20100
+            let random = Math.floor((Math.random() * 20001 + 100)) // 100-20100
             if (timeSeries.type === TimeSeriesType.ACTIVE_MINUTES) {
-                random = Math.floor((Math.random() * 100)) * 60000 // 0-100
+                random = Math.floor((Math.random() * 101)) * 60000 // 0-100 minute in milliseconds
             }
             timeSeries.summary.total += random
             timeSeries.dataSet.push(new Item(current.format('YYYY-MM-DD'), random))
@@ -50,32 +50,18 @@ export class TimeSeriesMock {
             const zones: HeartRateZone = new HeartRateZone()
             const heartRateItem = new HeartRateItem(current.format('YYYY-MM-DD'), zones)
 
-            for (let i = 0; i < 4; i++) {
-                const minutes = Math.floor((Math.random() * 100)) * 60000 // 0-100
-                const calories = !minutes ? 0 : Math.floor((Math.random() * 5100 + 100)) // 100-5100
-                switch (i) {
-                    case 0 :
-                        timeSeries.summary.outOfRangeTotal += minutes
-                        zones.outOfRange = new HeartRateZoneData(30, 91,
-                            minutes, calories, HeartRateZoneType.OUT_OF_RANGE)
-                        break
-                    case 1:
-                        timeSeries.summary.fatBurnTotal += minutes
-                        zones.fatBurn = new HeartRateZoneData(91, 127,
-                            minutes, calories, HeartRateZoneType.FAT_BURN)
-                        break
-                    case 2:
-                        timeSeries.summary.cardioTotal += minutes
-                        zones.cardio = new HeartRateZoneData(127, 154,
-                            minutes, calories, HeartRateZoneType.CARDIO)
-                        break
-                    default:
-                        timeSeries.summary.peakTotal += minutes
-                        zones.peak = new HeartRateZoneData(154, 220,
-                            minutes, calories, HeartRateZoneType.PEAK)
-                        break
-                }
-            }
+            zones.outOfRange = this.getZone(HeartRateZoneType.OUT_OF_RANGE)
+            timeSeries.summary.outOfRangeTotal += zones.outOfRange.duration
+
+            zones.fatBurn = this.getZone(HeartRateZoneType.FAT_BURN)
+            timeSeries.summary.fatBurnTotal += zones.fatBurn.duration
+
+            zones.cardio = this.getZone(HeartRateZoneType.CARDIO)
+            timeSeries.summary.cardioTotal += zones.cardio.duration
+
+            zones.peak = this.getZone(HeartRateZoneType.PEAK)
+            timeSeries.summary.peakTotal += zones.peak.duration
+
             timeSeries.dataSet.push(heartRateItem)
         }
         return timeSeries
@@ -88,5 +74,16 @@ export class TimeSeriesMock {
             randS += chars.charAt(Math.floor(Math.random() * chars.length))
         }
         return randS
+    }
+
+    private getZone(type): any {
+        const minutes = Math.floor((Math.random() * 101)) * 60000 // 0-100
+        const calories = !minutes ? 0 : Math.floor((Math.random() * 5101 + 100)) // 100-5100
+        return {
+            out_of_range: () => (new HeartRateZoneData(30, 91, minutes, calories, HeartRateZoneType.OUT_OF_RANGE)),
+            fat_burn: () => (new HeartRateZoneData(91, 127, minutes, calories, HeartRateZoneType.FAT_BURN)),
+            cardio: () => (new HeartRateZoneData(127, 154, minutes, calories, HeartRateZoneType.CARDIO)),
+            peak: () => (new HeartRateZoneData(154, 220, minutes, calories, HeartRateZoneType.PEAK))
+        }[type]()
     }
 }

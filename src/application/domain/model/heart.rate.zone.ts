@@ -66,22 +66,22 @@ export class HeartRateZone implements IJSONSerializable, IJSONDeserializable<Hea
         if (!json) return this
 
         if (json.out_of_range) {
-            json.out_of_range.name = HeartRateZoneType.OUT_OF_RANGE
+            json.out_of_range.type = HeartRateZoneType.OUT_OF_RANGE
             this.outOfRange = new HeartRateZoneData().fromJSON(json.out_of_range)
         }
 
         if (json.fat_burn) {
-            json.fat_burn.name = HeartRateZoneType.FAT_BURN
+            json.fat_burn.type = HeartRateZoneType.FAT_BURN
             this.fatBurn = new HeartRateZoneData().fromJSON(json.fat_burn)
         }
 
         if (json.cardio) {
-            json.cardio.name = HeartRateZoneType.CARDIO
+            json.cardio.type = HeartRateZoneType.CARDIO
             this.cardio = new HeartRateZoneData().fromJSON(json.cardio)
         }
 
         if (json.peak) {
-            json.peak.name = HeartRateZoneType.PEAK
+            json.peak.type = HeartRateZoneType.PEAK
             this.peak = new HeartRateZoneData().fromJSON(json.peak)
         }
         return this

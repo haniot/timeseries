@@ -14,8 +14,8 @@ export class TimeSeries implements IJSONSerializable, IJSONDeserializable<TimeSe
     private _patientId: string
 
     constructor(type?: string,
-                summary?: Summary | HeartRateSummary,
                 dataSet?: Array<Item | HeartRateItem>,
+                summary?: Summary | HeartRateSummary,
                 patientId?: string) {
         this._type = type ? type : ''
         this._dataSet = dataSet ? dataSet : []

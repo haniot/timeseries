@@ -14,7 +14,7 @@ import { TimeSeriesEntity } from '../entity/time.series.entity'
 import { Default } from '../../utils/default'
 
 /**
- * Implementation of the Time Series repository.
+ * Implementation of the Time Series infrastructure.
  *
  * @implements {ITimeSeriesRepository}
  */

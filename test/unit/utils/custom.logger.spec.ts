@@ -1,4 +1,5 @@
-import fs from 'fs-extra'
+import * as fs from 'fs'
+import * as path from 'path'
 import { assert } from 'chai'
 import { Default } from '../../../src/utils/default'
 import { CustomLogger } from '../../../src/utils/custom.logger'
@@ -7,7 +8,7 @@ import { Logger, transports } from 'winston'
 describe('UTILS: CustomLogger', () => {
     context('startup and configurations.', () => {
         it('should create log directory when instantiating.', async () => {
-            if (fs.existsSync(Default.LOG_DIR)) await fs.remove(Default.LOG_DIR)
+            if (fs.existsSync(Default.LOG_DIR)) await removeDir(Default.LOG_DIR)
             new CustomLogger()
             assert.equal(fs.existsSync(Default.LOG_DIR), true)
         })
@@ -157,6 +158,25 @@ describe('UTILS: CustomLogger', () => {
             })
         })
     })
+
+    const removeDir = (dirPath): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            try {
+                if (!fs.existsSync(dirPath)) return resolve()
+                for (const item of fs.readdirSync(dirPath)) {
+                    const filename = path.join(dirPath, item)
+                    const stat = fs.statSync(filename)
+
+                    if (stat.isDirectory()) removeDir(filename)
+                    else fs.unlinkSync(filename)
+                }
+                fs.rmdirSync(dirPath)
+                resolve()
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
 })
 
 class CustomException extends Error {

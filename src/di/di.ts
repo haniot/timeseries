@@ -12,7 +12,7 @@ import { ConnectionRabbitMQ } from '../infrastructure/eventbus/rabbitmq/connecti
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
 import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
 import { ConnectionFactoryInfluxDB } from '../infrastructure/database/connection.factory.infludb'
-import { MyInfluxDB } from '../infrastructure/database/influx.db'
+import { MyInfluxDB } from '../infrastructure/database/influxdb'
 import { IDatabase } from '../infrastructure/port/database.interface'
 import { ITimeSeriesService } from '../application/port/timeseries.service.interface'
 import { TimeSeriesService } from '../application/service/time.series.service'

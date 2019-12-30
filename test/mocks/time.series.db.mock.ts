@@ -1,5 +1,4 @@
 import moment from 'moment'
-// import { INanoDate } from 'influx'
 import { TimeSeries } from '../../src/application/domain/model/time.series'
 import { HeartRateZoneType } from '../../src/application/domain/utils/heart.rate.zone.type'
 import { TimeSeriesType } from '../../src/application/domain/utils/time.series.type'
@@ -7,7 +6,7 @@ import { TimeSeriesType } from '../../src/application/domain/utils/time.series.t
 export class TimeSeriesDBMock {
     public generate(startDate: string, endDate: string, type?: string): TimeSeries {
         if (!type) {
-            type = Object.values(TimeSeriesType)[Math.floor((Math.random() * 6))] // 0-5
+            type = Object.values(TimeSeriesType)[Math.floor((Math.random() * 5))] // 0-4
         }
 
         if (type !== TimeSeriesType.HEART_RATE) {
@@ -24,9 +23,9 @@ export class TimeSeriesDBMock {
         endDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD')
         let total = 0
         for (const current = moment(startDate); current.isBefore(endDate); current.add(1, 'days')) {
-            let random = Math.floor((Math.random() * 20000 + 100)) // 100-20100
+            let random = Math.floor((Math.random() * 20001 + 100)) // 100-20100
             if (type === TimeSeriesType.ACTIVE_MINUTES) {
-                random = Math.floor((Math.random() * 100)) * 60000 // 0-100
+                random = Math.floor((Math.random() * 101)) * 60000 // 0-100 in milliseconds
             }
             const datetime = current.format('YYYY-MM-DD').concat('T00:00:00.000Z')
             const time: any = {
@@ -51,39 +50,15 @@ export class TimeSeriesDBMock {
         endDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD')
         for (const current = moment(startDate); current.isBefore(endDate); current.add(1, 'days')) {
             const datetime = current.format('YYYY-MM-DD').concat('T00:00:00.000Z')
-            const time: any = {
-                toNanoISOString: () => datetime
-            }
             const _array: any = []
-            for (let i = 0; i < 4; i++) {
-                const minutes = Math.floor((Math.random() * 100)) * 60000 // 0-100
-                const calories = !minutes ? 0 : Math.floor((Math.random() * 5100 + 100)) // 100-5100
-                let item = {}
-                if (i === 0) {
-                    item = {
-                        time, min: 30, max: 91, value: minutes,
-                        calories, type: HeartRateZoneType.OUT_OF_RANGE
-                    }
-                } else if (i === 1) {
-                    item = {
-                        time, min: 91, max: 127, value: minutes, calories,
-                        type: HeartRateZoneType.FAT_BURN
-                    }
-                } else if (i === 2) {
-                    item = {
-                        time, min: 127, max: 154, value: minutes, calories,
-                        type: HeartRateZoneType.CARDIO
-                    }
-                } else {
-                    item = {
-                        time, min: 154, max: 220, value: minutes, calories,
-                        type: HeartRateZoneType.PEAK
-                    }
-                }
-                if (!totalDays) timeSeries.data_set.push(item)
-                else _array.push(item)
-            }
+
+            _array.push(this.getZone(HeartRateZoneType.OUT_OF_RANGE, datetime))
+            _array.push(this.getZone(HeartRateZoneType.FAT_BURN, datetime))
+            _array.push(this.getZone(HeartRateZoneType.CARDIO, datetime))
+            _array.push(this.getZone(HeartRateZoneType.PEAK, datetime))
+
             if (!totalDays) {
+                for (const item of _array) timeSeries.data_set.push(item)
                 timeSeries.data_set.groupRows = new Array(1)
             } else {
                 _array.groupRows = new Array(_array.lenght)
@@ -91,5 +66,19 @@ export class TimeSeriesDBMock {
             }
         }
         return timeSeries
+    }
+
+    private getZone(type, datetime): any {
+        const minutes = Math.floor((Math.random() * 101)) * 60000 // 0-100
+        const calories = !minutes ? 0 : Math.floor((Math.random() * 5101 + 100)) // 100-5100
+        const time: any = {
+            toNanoISOString: () => datetime
+        }
+        return {
+            out_of_range: () => ({ time, min: 30, max: 91, value: minutes, calories, type: HeartRateZoneType.OUT_OF_RANGE }),
+            fat_burn: () => ({ time, min: 91, max: 127, value: minutes, calories, type: HeartRateZoneType.FAT_BURN }),
+            cardio: () => ({ time, min: 127, max: 154, value: minutes, calories, type: HeartRateZoneType.CARDIO }),
+            peak: () => ({ time, min: 154, max: 220, value: minutes, calories, type: HeartRateZoneType.PEAK })
+        }[type]()
     }
 }

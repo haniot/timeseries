@@ -2,7 +2,7 @@ import { TimeSeries } from '../domain/model/time.series'
 import { IRepository } from './repository.interface'
 
 /**
- * TimeSeries repository interface.
+ * TimeSeries infrastructure interface.
  *
  * @extends {IRepository}
  */

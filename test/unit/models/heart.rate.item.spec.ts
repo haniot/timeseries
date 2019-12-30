@@ -1,0 +1,72 @@
+import { assert } from 'chai'
+import { HeartRateItem } from '../../../src/application/domain/model/heart.rate.item'
+import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
+import { HeartRateZoneData } from '../../../src/application/domain/model/heart.rate.zone.data'
+
+describe('MODELS: HeartRateItem', () => {
+    const hrZones: HeartRateZone = new HeartRateZone(
+        new HeartRateZoneData(30, 91, 150000, 22.0000),
+        new HeartRateZoneData(91, 127, 120000, 41.1500),
+        new HeartRateZoneData(127, 154, 10000, 15),
+        new HeartRateZoneData(154, 220, 135000, 22.0963)
+    )
+
+    it('should return HeartRateItem object with the correct values ​​according to values ​​set in the builder.', () => {
+        const expectedObj = {
+            date: new Date().toISOString().split('T')[0],
+            zones: hrZones
+        }
+        const item: HeartRateItem = new HeartRateItem(expectedObj.date, expectedObj.zones)
+
+        assert.equal(item.date, expectedObj.date)
+        assert.deepEqual(item.zones, expectedObj.zones)
+    })
+
+    it('should return the populated HeartRateItem object with the attributes set by the set methods.', () => {
+        const item: HeartRateItem = new HeartRateItem()
+        item.date = '2019-12-01'
+        item.zones = hrZones
+
+        assert.equal(item.date, '2019-12-01')
+        assert.deepEqual(item.zones.outOfRange, hrZones.outOfRange)
+        assert.deepEqual(item.zones.fatBurn, hrZones.fatBurn)
+        assert.deepEqual(item.zones.cardio, hrZones.cardio)
+        assert.deepEqual(item.zones.peak, hrZones.peak)
+    })
+
+    it('should return default values ​​when creating object without setting parameters in builder.', () => {
+        const item: HeartRateItem = new HeartRateItem()
+
+        assert.equal(item.date, '')
+        assert.deepEqual(item.zones, new HeartRateZone())
+    })
+
+    it('should return json object with expected attributes when calling toJSON() function.', () => {
+        const expectedObj = {
+            date: '2019-10-25',
+            zones: hrZones.toJSON()
+        }
+        assert.deepEqual(new HeartRateItem('2019-10-25', hrZones).toJSON(), expectedObj)
+    })
+
+    it('should return HeartRateItem object according to parameter passed in function fromJSON(json).', () => {
+        const date: string = new Date().toISOString().split('T')[0]
+        const expectedObj: HeartRateItem = new HeartRateItem(date, hrZones)
+        const json: any = {
+            date, zones: {
+                out_of_range: hrZones.outOfRange,
+                fat_burn: hrZones.fatBurn,
+                cardio: hrZones.cardio,
+                peak: hrZones.peak
+            }
+        }
+        assert.deepEqual(new HeartRateItem().fromJSON(json), expectedObj)
+    })
+
+    it('should return default HeartRateItem object when parameter passed in function fromJSON(json) is empty.', () => {
+        assert.deepEqual(new HeartRateItem().fromJSON({}), new HeartRateItem())
+        assert.deepEqual(new HeartRateItem().fromJSON(undefined), new HeartRateItem())
+        assert.deepEqual(new HeartRateItem().fromJSON(''), new HeartRateItem())
+        assert.deepEqual(new HeartRateItem().fromJSON(null), new HeartRateItem())
+    })
+})
