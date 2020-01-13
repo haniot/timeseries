@@ -29,7 +29,9 @@ export abstract class Strings {
         CONNECTION_NOT_EXIST: 'Instance of database connection does not exist!',
         VALIDATE: {
             REQUIRED_FIELDS: 'Required fields were not provided...',
-            REQUIRED_FIELDS_DESC: '{0} are required!'
+            REQUIRED_FIELDS_DESC: '{0} are required!',
+            VALUE: 'Value {0} is not valid!',
+            VALUE_DESC: 'Must be a number equal to or greater than zero...'
         },
         DATE: {
             YEAR_NOT_ALLOWED: 'Date {0} has year not allowed. The year must be greater than 1678 and less than 2261.',

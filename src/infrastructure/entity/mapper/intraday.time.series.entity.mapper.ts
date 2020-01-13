@@ -82,6 +82,8 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
 
     /**
      * Builds an IPoint object representing the heart rate measurement.
+     * NOTE: calories and duration are not saved to the intraday
+     * because the intraday has the information needed to return this information.
      *
      * @param zone
      * @param date

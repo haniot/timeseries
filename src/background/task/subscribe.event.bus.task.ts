@@ -8,6 +8,8 @@ import { Default } from '../../utils/default'
 import { UserDeleteEvent } from '../../application/integration-event/event/user.delete.event'
 import { UserDeleteEventHandler } from '../../application/integration-event/handler/user.delete.event.handler'
 import { DIContainer } from '../../di/di'
+import { TimeSeriesSyncEvent } from '../../application/integration-event/event/time.series.sync.event'
+import { TimeSeriesSyncEventHandler } from '../../application/integration-event/handler/time.series.sync.event.handler'
 
 @injectable()
 export class SubscribeEventBusTask implements IBackgroundTask {
@@ -54,9 +56,7 @@ export class SubscribeEventBusTask implements IBackgroundTask {
      */
     private async initializeSubscribe(): Promise<void> {
         try {
-            /**
-             * Subscribe in UserDeleteEvent
-             */
+            // Subscribe in UserDeleteEvent
             this._eventBus
                 .subscribe(
                     new UserDeleteEvent(),
@@ -68,6 +68,20 @@ export class SubscribeEventBusTask implements IBackgroundTask {
                 })
                 .catch(err => {
                     this._logger.error(`Error in Subscribe UserDeleteEvent! ${err.message}`)
+                })
+
+            // Subscribe in TimeSeriesSyncEvent
+            this._eventBus
+                .subscribe(
+                    new TimeSeriesSyncEvent(),
+                    new TimeSeriesSyncEventHandler(DIContainer.get(Identifier.TIMESERIES_REPOSITORY), this._logger),
+                    TimeSeriesSyncEvent.ROUTING_KEY
+                )
+                .then((result: boolean) => {
+                    if (result) this._logger.info('Subscribe in TimeSeriesSyncEvent successful!')
+                })
+                .catch(err => {
+                    this._logger.error(`Error in Subscribe TimeSeriesSyncEvent! ${err.message}`)
                 })
         } catch (err) {
             this._logger.error(`An error occurred while subscribing to events. ${err.message}`)
