@@ -30,9 +30,9 @@ export abstract class Identifier {
     public static readonly RABBITMQ_CONNECTION: any = Symbol.for('ConnectionRabbitMQ')
     public static readonly RABBITMQ_EVENT_BUS: any = Symbol.for('EventBusRabbitMQ')
     public static readonly BACKGROUND_SERVICE: any = Symbol.for('BackgroundService')
-    public static readonly SUBSCRIBE_EVENT_BUS_TASK: any = Symbol.for('SubscribeEventBusTask')
 
     // Tasks
+    public static readonly SUBSCRIBE_EVENT_BUS_TASK: any = Symbol.for('SubscribeEventBusTask')
 
     // Log
     public static readonly LOGGER: any = Symbol.for('CustomLogger')

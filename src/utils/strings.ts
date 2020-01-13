@@ -27,6 +27,10 @@ export abstract class Strings {
         INTERVAL_NOT_SUPPORTED: 'Interval {0} not supported!',
         INTERVAL_SUPPORTED: 'Only the following intervals types are supported: 1sec, 15sec, 1min or 15min.',
         CONNECTION_NOT_EXIST: 'Instance of database connection does not exist!',
+        VALIDATE: {
+            REQUIRED_FIELDS: 'Required fields were not provided...',
+            REQUIRED_FIELDS_DESC: '{0} are required!'
+        },
         DATE: {
             YEAR_NOT_ALLOWED: 'Date {0} has year not allowed. The year must be greater than 1678 and less than 2261.',
             INVALID_FORMAT: 'Date {0} is not valid!',
@@ -35,13 +39,13 @@ export abstract class Strings {
             INVALID_DATETIME_FORMAT_DESC: 'Datetime must be in the format: yyyy-MM-ddTHH:mm:ssZ',
             RANGE_INVALID: 'The interval between dates {0} and {1} is invalid!',
             RANGE_INVALID_DESC: 'The end_date parameter can not contain an older date than that the start_date parameter.',
-            RANGE_EXCEED_YEAR_DESC: 'The period between the received dates can not exceed 1 year.',
+            RANGE_EXCEED_YEAR_DESC: 'The period between the received dates can not exceed 1 year.'
         },
         TIME: {
             INVALID_FORMAT: 'Time {0} is not valid!',
             INVALID_FORMAT_DESC: 'Time must be in the format: hh:mm:ss or hh:mm.',
             RANGE_INVALID: 'The interval between dates and times is invalid!',
-            RANGE_INVALID_DESC: 'The period between the two dates and times cannot exceed 24 hours.',
+            RANGE_INVALID_DESC: 'The period between the two dates and times cannot exceed 24 hours.'
         }
     }
 }

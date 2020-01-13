@@ -11,6 +11,8 @@ import { RepositoryException } from '../../application/domain/exception/reposito
 import { Strings } from '../../utils/strings'
 import { Default } from '../../utils/default'
 import { TimeSeriesType } from '../../application/domain/utils/time.series.type'
+import { heartRateZonesSchema } from '../database/schema/heartRateZonesSchema'
+import { intradayTimeSeriesSchema } from '../database/schema/intraday.time.series.schema'
 
 /**
  * Implementation of the Time Series infrastructure.
@@ -25,9 +27,8 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
         private readonly _mapper: IEntityMapper<IntradayTimeSeries, IntradayTimeSeriesEntity>,
         @inject(Identifier.LOGGER) protected readonly _logger: ILogger
     ) {
-        // Schemes are already being inserted into TimeSeriesRepository
-        // this._db.connection?.addSchema(intradayTimeSeriesSchema)
-        // this._db.connection?.addSchema(heartRateZonesSchema)
+        this._db.connection?.addSchema(intradayTimeSeriesSchema)
+        this._db.connection?.addSchema(heartRateZonesSchema)
     }
 
     public create(item: IntradayTimeSeries): Promise<IntradayTimeSeries> {

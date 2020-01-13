@@ -1,3 +1,3 @@
 export interface IIntegrationEventHandler<T> {
-    handle(event: T): void
+    handle(event: T): Promise<void>
 }
