@@ -10,6 +10,9 @@ import { ITimeSeriesRepository } from '../../../src/application/port/timeseries.
 import { TimeSeriesMock } from '../../mocks/time.series.mock'
 import { TimeSeriesType } from '../../../src/application/domain/utils/time.series.type'
 import { TimeSeriesGroup } from '../../../src/application/domain/model/time.series.group'
+import { IntradayTimeSeries } from '../../../src/application/domain/model/intraday.time.series'
+import { IntradayTimeSeriesMock } from '../../mocks/intraday.time.series.mock'
+import { IIntradayTimeSeriesRepository } from '../../../src/application/port/intraday.time.series.repository.interface'
 
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
@@ -247,10 +250,11 @@ describe('CONTROLLER: timeseries', () => {
             const startDate = '2019-01-01'
             const endDate = '2019-12-31'
             const tmSteps: TimeSeries = new TimeSeriesMock().generate(startDate, endDate, TimeSeriesType.STEPS)
-            const tmCalories: TimeSeries = new TimeSeriesMock().generate(startDate, endDate, TimeSeriesType.CALORIES)
             const tmDistance: TimeSeries = new TimeSeriesMock().generate(startDate, endDate, TimeSeriesType.DISTANCE)
             const tmActiveMinutes: TimeSeries = new TimeSeriesMock().generate(startDate, endDate, TimeSeriesType.ACTIVE_MINUTES)
             const tmHeartRate: TimeSeries = new TimeSeriesMock().generate(startDate, endDate, TimeSeriesType.HEART_RATE)
+            const tmCalories: TimeSeries = new TimeSeriesMock().generate(startDate, endDate, TimeSeriesType.CALORIES)
+            tmCalories.patientId = tmHeartRate.patientId
 
             before(async () => {
                 await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
@@ -311,7 +315,7 @@ describe('CONTROLLER: timeseries', () => {
                     })
             })
 
-            it('should return status code 200 for timeseries of type heart_rate.', () => {
+            it('should return status code 200 for time series of type heart_rate.', () => {
                 return request
                     .get(`/v1/patients/${tmHeartRate.patientId}/heart_rate/date/${startDate}/${endDate}/timeseries`)
                     .set('Accept', 'application/json')
@@ -319,6 +323,30 @@ describe('CONTROLLER: timeseries', () => {
                     .then(res => {
                         expect(res.body.data_set.length).to.equal(tmHeartRate.dataSet.length)
                         expect(res.body).to.deep.equal(tmHeartRate.toJSON())
+                    })
+            })
+
+            it('should return status code 200 for time series of type heart_rate (data intraday).', async () => {
+                await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                const startTime = '2017-06-01T00:00:00.000Z'
+                const endTime = '2017-06-01T23:59:59.000Z'
+                const intradayHeartRate: IntradayTimeSeries = new IntradayTimeSeriesMock()
+                    .generate(startTime, endTime, '1m', TimeSeriesType.HEART_RATE)
+                const intradayCalories: IntradayTimeSeries = new IntradayTimeSeriesMock()
+                    .generate(startTime, endTime, '1m', TimeSeriesType.CALORIES)
+                intradayCalories.patientId = intradayHeartRate.patientId
+
+                await addIntradayTimeSeries(intradayCalories)
+                await addIntradayTimeSeries(intradayHeartRate)
+
+                return request
+                    .get(`/v1/patients/${intradayHeartRate.patientId}/heart_rate/date/2017-06-01/2017-06-01/timeseries`)
+                    .set('Accept', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        const item: any = res.body.data_set[0]
+                        expect(res.body.data_set.length).to.equal(1)
+                        expect(item.date).to.equal('2017-06-01')
                     })
             })
 
@@ -369,6 +397,7 @@ describe('CONTROLLER: timeseries', () => {
                     }
 
                     const result = await request.get(`/v1/patients/1a62be07d6f33400146c9b63/heart_rate/date/2019-01-05/2019-01-09/timeseries`)
+
                     expect(result.body.data_set.length).to.equal(tmDefault.data_set.length)
                     expect(result.body).to.deep.equal(tmDefault)
                 })
@@ -422,11 +451,11 @@ describe('CONTROLLER: timeseries', () => {
                         .expect(400)
                         .then(res => {
                             expect(res.body.message).to.equal(
-                                Strings.ERROR_MESSAGE.TIMESERIES_NOT_SUPPORTED
+                                Strings.ERROR_MESSAGE.RESOURCE_NOT_SUPPORTED
                                     .replace('{0}', 'temperature')
                             )
                             expect(res.body.description).to.equal(
-                                Strings.ERROR_MESSAGE.TIMESERIES_SUPPORTED
+                                Strings.ERROR_MESSAGE.RESOURCE_SUPPORTED
                                     .replace('{0}', Object.values(TimeSeriesType).join(', '))
                             )
                         })
@@ -510,11 +539,17 @@ async function addTimeSeries(timeSeries: TimeSeries): Promise<void> {
     await repo.create(timeSeries)
 }
 
+async function addIntradayTimeSeries(intradayTimeSeries: IntradayTimeSeries): Promise<void> {
+    const repo: IIntradayTimeSeriesRepository = DIContainer.get<IIntradayTimeSeriesRepository>(Identifier.INTRADAY_REPOSITORY)
+    await repo.create(intradayTimeSeries)
+}
+
 function deleteAll(): Promise<void> {
     return new Promise((resolve, reject) => {
         if (!db.connection) return resolve()
         db.connection
-            .query(`DROP SERIES FROM ${Default.MEASUREMENT_NAME}; DROP SERIES FROM ${Default.MEASUREMENT_HR_NAME}`
+            .query(`DROP SERIES FROM ${Default.MEASUREMENT_TIMESERIES_NAME};
+                DROP SERIES FROM ${Default.MEASUREMENT_HR_ZONES_NAME}`
             )
             .then(() => resolve())
             .catch((err) => reject(err))

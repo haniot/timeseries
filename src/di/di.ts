@@ -27,6 +27,10 @@ import { IEntityMapper } from '../infrastructure/port/entity.mapper.interface'
 import { TimeSeries } from '../application/domain/model/time.series'
 import { TimeSeriesEntity } from '../infrastructure/entity/time.series.entity'
 import { TimeSeriesEntityMapper } from '../infrastructure/entity/mapper/time.series.entity.mapper'
+import { IntradayTimeSeriesController } from '../ui/controller/intraday.timeseries.controller'
+import { IntradayTimeSeriesEntityMapper } from '../infrastructure/entity/mapper/intraday.time.series.entity.mapper'
+import { IntradayTimeSeries } from '../application/domain/model/intraday.time.series'
+import { IntradayTimeSeriesEntity } from '../infrastructure/entity/intraday.time.series.entity'
 
 class IoC {
     private readonly _container: Container
@@ -59,6 +63,8 @@ class IoC {
             .to(HomeController).inSingletonScope()
         this._container.bind<TimeSeriesController>(Identifier.TIMESERIES_CONTROLLER)
             .to(TimeSeriesController).inSingletonScope()
+        this._container.bind<IntradayTimeSeriesController>(Identifier.INTRADAY_CONTROLLER)
+            .to(IntradayTimeSeriesController).inSingletonScope()
 
         // Services
         this._container.bind<ITimeSeriesService>(Identifier.TIMESERIES_SERVICE)
@@ -76,6 +82,9 @@ class IoC {
         this.container
             .bind<IEntityMapper<TimeSeries, TimeSeriesEntity>>(Identifier.TIME_SERIES_ENTITY_MAPPER)
             .to(TimeSeriesEntityMapper).inSingletonScope()
+        this.container
+            .bind<IEntityMapper<IntradayTimeSeries, IntradayTimeSeriesEntity>>(Identifier.INTRADAY_ENTITY_MAPPER)
+            .to(IntradayTimeSeriesEntityMapper).inSingletonScope()
 
         // Background Services
         this._container

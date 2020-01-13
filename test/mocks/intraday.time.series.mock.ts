@@ -6,29 +6,32 @@ import { IntradayItem } from '../../src/application/domain/model/intraday.item'
 import { IntradayHeartRateSummary } from '../../src/application/domain/model/intraday.heart.rate.summary'
 import { HeartRateZone } from '../../src/application/domain/model/heart.rate.zone'
 import { HeartRateZoneData } from '../../src/application/domain/model/heart.rate.zone.data'
+import { HeartRateZoneType } from '../../src/application/domain/utils/heart.rate.zone.type'
 
 export class IntradayTimeSeriesMock {
-    public generate(startDate: string, endDate: string, type?: string): IntradayTimeSeries {
+    public generate(startTime: string, endTime: string, interval: string, type?: string): IntradayTimeSeries {
         if (!type) {
             type = Object.values(TimeSeriesType)[Math.floor((Math.random() * 5))] // 0-5
         }
 
         if (type !== TimeSeriesType.HEART_RATE) {
-            return this.generateIntradayTimeSeries(startDate, endDate, type)
+            return this.generateIntradayTimeSeries(startTime, endTime, interval, type)
         }
-        return this.generateHeartRateIntradayTimeSeries(startDate, endDate)
+        return this.generateHeartRateIntradayTimeSeries(startTime, endTime, interval)
     }
 
-    private generateIntradayTimeSeries(startDate: string, endDate: string, type: string): IntradayTimeSeries {
+    private generateIntradayTimeSeries(startTime: string, endTime: string, interval: string, type: string): IntradayTimeSeries {
         const timeSeries = new IntradayTimeSeries()
         timeSeries.type = type
         timeSeries.patientId = this.generateObjectId()
         timeSeries.summary = new IntradaySummary()
-        timeSeries.summary.interval = '1min'
-        timeSeries.summary.startTime = startDate
-        timeSeries.summary.endTime = endDate
+        timeSeries.summary.interval = interval
+        timeSeries.summary.startTime = startTime
+        timeSeries.summary.endTime = endTime
 
-        for (const current = moment(startDate); current.isBefore(endDate); current.utc().add(1, 'minute')) {
+        const intervalValue = parseInt(interval.slice(0, -1), 10)
+        const intervalUnit = interval.slice(-1) === 's' ? 'seconds' : 'minutes'
+        for (const current = moment(startTime); current.isBefore(endTime); current.add(intervalValue, intervalUnit)) {
             let random = 0
             if (timeSeries.type === TimeSeriesType.STEPS) {
                 random = Math.floor((Math.random() * 101)) // 0-100
@@ -40,12 +43,12 @@ export class IntradayTimeSeriesMock {
                 random = Math.floor(Math.random() * 2) * 60000 // 0-1 minute in milliseconds
             }
             timeSeries.summary.total += random
-            timeSeries.dataSet.push(new IntradayItem(current.format(), random))
+            timeSeries.dataSet.push(new IntradayItem(current.format('HH:mm:ss'), random))
         }
         return timeSeries
     }
 
-    private generateHeartRateIntradayTimeSeries(startDate: string, endDate: string): IntradayTimeSeries {
+    private generateHeartRateIntradayTimeSeries(startDate: string, endDate: string, interval: string): IntradayTimeSeries {
         const timeSeries = new IntradayTimeSeries()
         timeSeries.type = TimeSeriesType.HEART_RATE
         timeSeries.patientId = this.generateObjectId()
@@ -54,11 +57,13 @@ export class IntradayTimeSeriesMock {
         timeSeries.summary.endTime = endDate
         timeSeries.summary.min = Number.MAX_SAFE_INTEGER
         timeSeries.summary.max = Number.MIN_SAFE_INTEGER
-        timeSeries.summary.interval = '1sec'
+        timeSeries.summary.interval = interval
         let sum = 0
 
-        endDate = moment(endDate).utc().add(1, 'second').format()
-        for (const current = moment(startDate); current.utc().isBefore(endDate); current.utc().add(1, 'second')) {
+        const intervalValue = parseInt(interval.slice(0, -1), 10)
+        const intervalUnit = interval.slice(-1) === 's' ? 'seconds' : 'minutes'
+        // endDate = moment(endDate).add(1, 'minute').format()
+        for (const current = moment(startDate); current.isBefore(endDate); current.add(intervalValue, intervalUnit)) {
             const random = Math.floor((Math.random() * 201)) + 30 // 30-200
 
             sum += random
@@ -66,19 +71,19 @@ export class IntradayTimeSeriesMock {
                 if (random < timeSeries.summary.min) timeSeries.summary.min = random
                 if (random > timeSeries.summary.max) timeSeries.summary.max = random
             }
-            timeSeries.dataSet.push(new IntradayItem(current.format(), random))
+            timeSeries.dataSet.push(new IntradayItem(current.format('HH:mm:ss'), random))
         }
         timeSeries.summary.zones = this.getHeartRateZone(timeSeries.dataSet)
-        timeSeries.summary.average = Math.floor(sum / timeSeries.dataSet.length)
+        timeSeries.summary.average = Math.round(sum / timeSeries.dataSet.length)
         return timeSeries
     }
 
     private getHeartRateZone(_array: Array<IntradayItem>): HeartRateZone {
         const heartRateZone = new HeartRateZone(
-            new HeartRateZoneData(30, 91),
-            new HeartRateZoneData(91, 127),
-            new HeartRateZoneData(127, 154),
-            new HeartRateZoneData(154, 220)
+            new HeartRateZoneData(30, 91, 0, 0, HeartRateZoneType.OUT_OF_RANGE),
+            new HeartRateZoneData(91, 127, 0, 0, HeartRateZoneType.FAT_BURN),
+            new HeartRateZoneData(127, 154, 0, 0, HeartRateZoneType.CARDIO),
+            new HeartRateZoneData(154, 220, 0, 0, HeartRateZoneType.PEAK)
         )
         for (const item of _array) {
             const calories: number = (Math.random() * 5100 + 100) // 100-5100

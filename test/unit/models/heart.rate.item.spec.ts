@@ -2,13 +2,14 @@ import { assert } from 'chai'
 import { HeartRateItem } from '../../../src/application/domain/model/heart.rate.item'
 import { HeartRateZone } from '../../../src/application/domain/model/heart.rate.zone'
 import { HeartRateZoneData } from '../../../src/application/domain/model/heart.rate.zone.data'
+import { HeartRateZoneType } from '../../../src/application/domain/utils/heart.rate.zone.type'
 
 describe('MODELS: HeartRateItem', () => {
     const hrZones: HeartRateZone = new HeartRateZone(
-        new HeartRateZoneData(30, 91, 150000, 22.0000),
-        new HeartRateZoneData(91, 127, 120000, 41.1500),
-        new HeartRateZoneData(127, 154, 10000, 15),
-        new HeartRateZoneData(154, 220, 135000, 22.0963)
+        new HeartRateZoneData(30, 91, 150000, 22.0000, HeartRateZoneType.OUT_OF_RANGE),
+        new HeartRateZoneData(91, 127, 120000, 41.1500, HeartRateZoneType.FAT_BURN),
+        new HeartRateZoneData(127, 154, 10000, 15, HeartRateZoneType.CARDIO),
+        new HeartRateZoneData(154, 220, 135000, 22.0963, HeartRateZoneType.PEAK)
     )
 
     it('should return HeartRateItem object with the correct values ​​according to values ​​set in the builder.', () => {

@@ -18,7 +18,7 @@ describe('MODELS: IntradayHeartRateSummary', () => {
             end_time: new Date().toISOString(),
             min: Math.floor(Math.random() * 100),
             average: Math.floor(Math.random() * 150),
-            interval: '1sec',
+            interval: '1s',
             zones: hrZones
         }
         expectedObj.max = expectedObj.min + Math.floor(Math.random() * 100)
@@ -45,7 +45,7 @@ describe('MODELS: IntradayHeartRateSummary', () => {
         intradayHeartRateSummary.min = 60
         intradayHeartRateSummary.max = 220
         intradayHeartRateSummary.average = 87
-        intradayHeartRateSummary.interval = '1sec'
+        intradayHeartRateSummary.interval = '1s'
         intradayHeartRateSummary.zones = new HeartRateZone()
 
         assert.equal(intradayHeartRateSummary.startTime, '2019-06-08T00:00:00.000Z')
@@ -53,7 +53,7 @@ describe('MODELS: IntradayHeartRateSummary', () => {
         assert.equal(intradayHeartRateSummary.min, 60)
         assert.equal(intradayHeartRateSummary.max, 220)
         assert.equal(intradayHeartRateSummary.average, 87)
-        assert.equal(intradayHeartRateSummary.interval, '1sec')
+        assert.equal(intradayHeartRateSummary.interval, '1s')
         assert.deepEqual(intradayHeartRateSummary.zones, new HeartRateZone())
     })
 
@@ -75,7 +75,7 @@ describe('MODELS: IntradayHeartRateSummary', () => {
             end_time: new Date().toISOString(),
             min: Math.floor(Math.random() * 100),
             average: Math.floor(Math.random() * 90),
-            interval: '1min',
+            interval: '1m',
             zones: hrZones.toJSON()
         }
         expectedObj.max = expectedObj.min + Math.floor(Math.random() * 100)

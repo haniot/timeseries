@@ -68,10 +68,10 @@ export class HeartRateZoneData implements IJSONSerializable, IJSONDeserializable
     public fromJSON(json: any): HeartRateZoneData {
         if (!json) return this
 
-        if (json.min !== undefined) this.min = json.min
-        if (json.max !== undefined) this.max = json.max
-        if (json.duration !== undefined) this.duration = json.duration
-        if (json.calories !== undefined) this.calories = json.calories
+        if (json.min) this.min = json.min
+        if (json.max) this.max = json.max
+        if (json.duration) this.duration = json.duration
+        if (json.calories) this.calories = json.calories
         if (json.type) this.type = json.type
         return this
     }

@@ -2,12 +2,13 @@ import { assert } from 'chai'
 import { IntradayTimeSeries } from '../../../src/application/domain/model/intraday.time.series'
 import { IntradayTimeSeriesMock } from '../../mocks/intraday.time.series.mock'
 import { IntradaySummary } from '../../../src/application/domain/model/intraday.summary'
+import { IntradayHeartRateSummary } from '../../../src/application/domain/model/intraday.heart.rate.summary'
 
 describe('MODELS: IntradayTimeSeries', () => {
 
     it('should return IntradayTimeSeries object with the correct values ​​according to values ​​set in the builder.', () => {
         const expectedObj: IntradayTimeSeries = new IntradayTimeSeriesMock()
-            .generate('2019-12-30T03:00:00.000Z', '2019-12-31T02:59:59.000Z', 'heart_rate')
+            .generate('2019-12-30T03:00:00.000Z', '2019-12-31T02:59:59.000Z', '1m', 'heart_rate')
 
         const intradayTimeSeries: IntradayTimeSeries = new IntradayTimeSeries(
             expectedObj.type,
@@ -23,7 +24,7 @@ describe('MODELS: IntradayTimeSeries', () => {
 
     it('should return the populated IntradayTimeSeries object with the attributes set by the set methods.', () => {
         const expectedObj: IntradayTimeSeries = new IntradayTimeSeriesMock()
-            .generate('2019-12-29T10:00:00.000Z', '2019-12-31T10:35:00.000Z', 'calories')
+            .generate('2019-12-29T10:00:00.000Z', '2019-12-31T10:35:00.000Z', '1m', 'calories')
 
         const intradayTimeSeries: IntradayTimeSeries = new IntradayTimeSeries()
         intradayTimeSeries.dataSet = expectedObj.dataSet
@@ -48,7 +49,7 @@ describe('MODELS: IntradayTimeSeries', () => {
 
     it('should return json object with expected attributes when calling toJSON() function.', () => {
         const expectedObj: IntradayTimeSeries = new IntradayTimeSeriesMock()
-            .generate('2019-12-29T10:00:00.000Z', '2019-12-31T10:35:00.000Z', 'distance')
+            .generate('2019-12-29T10:00:00.000Z', '2019-12-29T10:35:00.000Z', '1m', 'distance')
 
         assert.deepEqual(new IntradayTimeSeries(
             expectedObj.type,
@@ -60,7 +61,7 @@ describe('MODELS: IntradayTimeSeries', () => {
 
     it('should return IntradayTimeSeries object according to parameter passed in function fromJSON(json): steps.', () => {
         const expectedObj: IntradayTimeSeries = new IntradayTimeSeriesMock()
-            .generate('2019-12-29T10:00:00.000Z', '2019-12-31T11:25:00.000Z', 'steps')
+            .generate('2019-12-29T10:00:00', '2019-12-29T11:25:00', '1m', 'steps')
         const json: any = expectedObj.toJSON()
         json.type = 'steps'
         json.patient_id = expectedObj.patientId
@@ -73,17 +74,21 @@ describe('MODELS: IntradayTimeSeries', () => {
     })
 
     it('should return IntradayTimeSeries object according to parameter passed in function fromJSON(json): heart_rate.', () => {
-        const expectedObj: IntradayTimeSeries = new IntradayTimeSeriesMock()
-            .generate('2019-12-29T10:00:00.000Z', '2019-12-31T11:25:00.000Z', 'heart_rate')
-        const json: any = expectedObj.toJSON()
+        const intradayTimeSeries: any = new IntradayTimeSeriesMock()
+            .generate('2019-12-29T10:00:00', '2019-12-29T10:25:00', '1s', 'heart_rate')
+        const json: any = intradayTimeSeries.toJSON()
         json.type = 'heart_rate'
-        json.patient_id = expectedObj.patientId
+        json.patient_id = intradayTimeSeries.patientId
+        json.start_time = intradayTimeSeries.summary.startTime
+        json.end_time = intradayTimeSeries.summary.endTime
+        json.zones = intradayTimeSeries.summary.zones.toJSON()
 
         const result = new IntradayTimeSeries().fromJSON(json)
 
-        assert.deepEqual(result.dataSet, expectedObj.dataSet)
-        assert.equal(result.type, expectedObj.type)
-        assert.equal(result.patientId, expectedObj.patientId)
+        assert.deepEqual(intradayTimeSeries.dataSet, result.dataSet)
+        assert.equal(intradayTimeSeries.type, result.type)
+        assert.equal(intradayTimeSeries.patientId, result.patientId)
+        assert.deepEqual(intradayTimeSeries.summary.zones, (result.summary as IntradayHeartRateSummary).zones)
     })
 
     it('should return IntradayTimeSeries object with default values of due invalid json ' +
@@ -100,7 +105,7 @@ describe('MODELS: IntradayTimeSeries', () => {
     it('should return IntradayTimeSeries object via the fromJSON(json) function, ' +
         'where json is in string format.', () => {
         const expectedObj: IntradayTimeSeries = new IntradayTimeSeriesMock()
-            .generate('2019-12-29T10:00:00.000Z', '2019-12-31T10:35:00.000Z', 'active_minutes')
+            .generate('2019-12-29T10:00:00', '2019-12-29T10:35:00', '1m', 'active_minutes')
         const json: any = expectedObj.toJSON()
         json.type = expectedObj.type
         json.patient_id = expectedObj.patientId
@@ -112,9 +117,10 @@ describe('MODELS: IntradayTimeSeries', () => {
         assert.equal(result.patientId, expectedObj.patientId)
     })
 
-    it('should return IntradayTimeSeries object with empty data_set due to missing attribute in function call fromJSON(json).', () => {
+    it('should return IntradayTimeSeries object with empty data_set due to missing attribute ' +
+        'in function call fromJSON(json).', () => {
         const expectedObj: IntradayTimeSeries = new IntradayTimeSeriesMock()
-            .generate('2019-12-29T09:10:15.000Z', '2019-12-31T09:55:00.000Z', 'distance')
+            .generate('2019-12-29T09:10:15', '2019-12-29T09:55:00.000Z', '1m', 'distance')
         const json: any = expectedObj.toJSON()
         json.type = expectedObj.type
         json.patient_id = expectedObj.patientId

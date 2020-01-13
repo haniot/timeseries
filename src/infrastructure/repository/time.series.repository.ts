@@ -5,13 +5,14 @@ import { ILogger } from '../../utils/custom.logger'
 import { ITimeSeriesRepository } from '../../application/port/timeseries.repository.interface'
 import { IDatabase } from '../port/database.interface'
 import { TimeSeries } from '../../application/domain/model/time.series'
-import { timeSeriesSchema } from '../database/schema/time.series.schema'
-import { TimeSeriesType } from '../../application/domain/utils/time.series.type'
-import { heartRateTimeSeriesSchema } from '../database/schema/heart.rate.time.series.schema'
-import { BaseRepository } from './base/base.repository'
 import { IEntityMapper } from '../port/entity.mapper.interface'
 import { TimeSeriesEntity } from '../entity/time.series.entity'
 import { Default } from '../../utils/default'
+import { RepositoryException } from '../../application/domain/exception/repository.exception'
+import { Strings } from '../../utils/strings'
+import { TimeSeriesType } from '../../application/domain/utils/time.series.type'
+import { intradayTimeSeriesSchema } from '../database/schema/intraday.time.series.schema'
+import { heartRateZonesSchema } from '../database/schema/heartRateZonesSchema'
 
 /**
  * Implementation of the Time Series infrastructure.
@@ -19,63 +20,127 @@ import { Default } from '../../utils/default'
  * @implements {ITimeSeriesRepository}
  */
 @injectable()
-export class TimeSeriesRepository extends BaseRepository implements ITimeSeriesRepository {
+export class TimeSeriesRepository implements ITimeSeriesRepository {
     constructor(
         @inject(Identifier.INFLUXDB_CONNECTION) private readonly _db: IDatabase,
         @inject(Identifier.TIME_SERIES_ENTITY_MAPPER) private readonly _mapper: IEntityMapper<TimeSeries, TimeSeriesEntity>,
         @inject(Identifier.LOGGER) protected readonly _logger: ILogger
     ) {
-        super(_logger)
-        this._db.connection?.addSchema(timeSeriesSchema)
-        this._db.connection?.addSchema(heartRateTimeSeriesSchema)
+        this._db.connection?.addSchema(intradayTimeSeriesSchema)
+        this._db.connection?.addSchema(heartRateZonesSchema)
     }
 
     public create(item: TimeSeries): Promise<TimeSeries> {
         return new Promise((resolve, reject) => {
             if (!this._db.connection) {
-                return reject(super.dbErrorListener(new Error('Instance of database connection does not exist!')))
+                return reject(new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED))
             }
 
             // Preparing the measure to be entered all at once
             this._db.connection
                 .writePoints((this._mapper.transform(item) as TimeSeriesEntity).points)
                 .then((result) => resolve())
-                .catch((err) => reject(super.dbErrorListener(err)))
+                .catch((err) => {
+                    this._logger.error(err)
+                    return reject(new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED))
+                })
         })
     }
 
     public delete(id: string): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            if (!this._db.connection) {
-                return reject(super.dbErrorListener(new Error('Instance of database connection does not exist!')))
-            }
-
-            this._db.connection
-                .query(`DROP SERIES FROM ${Default.MEASUREMENT_NAME} WHERE user_id = '${id}';
-                    DROP SERIES FROM ${Default.MEASUREMENT_HR_NAME} WHERE user_id = '${id}';`
-                )
-                .then(() => resolve(true))
-                .catch((err) => reject(super.dbErrorListener(err)))
-        })
+        throw new Error('Not implemented!')
     }
 
     public async listByType(patientId: string, startDate: string, endDate: string, type: string): Promise<TimeSeries> {
-        return new Promise<TimeSeries>((resolve, reject) => {
-            if (!this._db.connection) {
-                return reject(super.dbErrorListener(new Error('Instance of database connection does not exist!')))
-            }
+        if (!this._db.connection) {
+            throw new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED)
+        }
 
-            let query: any = this.buildQuery(patientId, startDate, endDate, type)
-            if (type === TimeSeriesType.HEART_RATE) query = this.buildQueryHeartRate(patientId, startDate, endDate)
+        const startTime = moment(`${startDate}T00:00:00`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+        const endTime = moment(`${endDate}T23:59:59`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
 
-            this._db.connection
-                .query(query)
-                .then((result: any) => {
-                    result = { type, start_date: startDate, end_date: endDate, data_set: result }
+        if (type !== TimeSeriesType.HEART_RATE) return this.buildResult(patientId, type, startDate, endDate, startTime, endTime)
+        return this.buildResultHR(patientId, startDate, endDate)
+    }
+
+    /**
+     * Converts the result of the database query to the expected format.
+     *
+     * @param patientId
+     * @param type
+     * @param startDate
+     * @param endDate
+     * @param startTime
+     * @param endTime
+     */
+    private async buildResult(patientId: string, type: string,
+                              startDate: string, endDate: string,
+                              startTime: string, endTime: string): Promise<TimeSeries> {
+        return new Promise<TimeSeries>(async (resolve, reject) => {
+            const query: Array<string> = this.buildQuery(patientId, type, startTime, endTime)
+            this._db.connection!.query(query)
+                .then((res: Array<any>) => {
+                    const result: any = { type, start_date: startDate, end_date: endDate, total: 0 }
+                    result.data_set = res[0]
+                    if (res[1].groupRows.length) result.total = res[1][0].total
                     return resolve(this._mapper.transform(result))
                 })
-                .catch(err => reject(super.dbErrorListener(err)))
+                .catch(err => {
+                    this._logger.error(err)
+                    return reject(new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED))
+                })
         })
+    }
+
+    /**
+     * Converts the result of querying the heart rate database to the expected format.
+     *
+     * @param patientId
+     * @param startDate
+     * @param endDate
+     */
+    private async buildResultHR(patientId: string, startDate: string, endDate: string): Promise<TimeSeries> {
+        return new Promise<TimeSeries>(async (resolve, reject) => {
+            try {
+                const result: any = {
+                    type: TimeSeriesType.HEART_RATE, start_date: startDate, end_date: endDate, zones: []
+                }
+                result.data_set = await this._db.connection!.query(this.buildQueryHR(patientId, startDate, endDate))
+                result.calories = await this._db.connection!.query(this.buildQueryCalories(patientId, startDate, endDate))
+                result.zones = await this.getZones(patientId, startDate, endDate)
+
+                return resolve(this._mapper.transform(result))
+            } catch (err) {
+                this._logger.error(err)
+                return reject(new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED))
+            }
+        })
+    }
+
+    /**
+     * Retrieves heart rate zones from database.
+     * If there is no zone on the specified date the last ones are retrieved.
+     *
+     * @param patientId
+     * @param startDate
+     * @param endDate
+     */
+    private async getZones(patientId: string, startDate: string, endDate: string): Promise<any> {
+        try {
+            const queryZones: string = `SELECT min, max, "duration", calories, type FROM ${Default.MEASUREMENT_HR_ZONES_NAME}
+                WHERE user_id = '${patientId}' AND time >= '${startDate}T00:00:00.000Z' AND time <= '${endDate}T00:00:00.000Z';`
+
+            const result: any = { data: [], data_default: [] }
+            result.data = await this._db.connection!.query(queryZones)
+            result.data_default = await this._db.connection!.query(
+                `SELECT min, max, "duration", calories, type FROM ${Default.MEASUREMENT_HR_ZONES_NAME}
+                    WHERE user_id = '${patientId}' ORDER BY time DESC LIMIT 4;`
+            )
+            return result
+        } catch (err) {
+            this._logger.error(err)
+            throw new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED)
+        }
     }
 
     /**
@@ -84,43 +149,75 @@ export class TimeSeriesRepository extends BaseRepository implements ITimeSeriesR
      * in the period between start and end date.
      *
      * @param patientId
-     * @param startDate
-     * @param endDate
      * @param type
+     * @param startTime
+     * @param endTime
      */
-    private buildQuery(patientId: string, startDate: string, endDate: string, type: string): Array<string> {
+    private buildQuery(patientId: string, type: string,
+                       startTime: string, endTime: string): Array<string> {
         return [
-            `SELECT SUM(value) as value FROM ${Default.MEASUREMENT_NAME}
+            `SELECT SUM(value) as value FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
                 WHERE user_id = '${patientId}'
                 AND type = '${type}'
-                AND time >= '${startDate}'
-                AND time <= '${endDate}'
+                AND time >= '${startTime}'
+                AND time <= '${endTime}'
                 GROUP BY time(1d) fill(0) ORDER BY time ASC;`,
-            `SELECT SUM(value) as total FROM ${Default.MEASUREMENT_NAME}
+            `SELECT SUM(value) as total FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
                 WHERE user_id = '${patientId}'
                 AND type = '${type}'
-                AND time >= '${startDate}'
-                AND time <= '${endDate}';`
+                AND time >= '${startTime}'
+                AND time <= '${endTime}';`
         ]
     }
 
     /**
-     * Create the query for heart rate according to the parameters.
-     * is creating a SELECT for each day, making it easy to identify days without data,
-     * because the query returns an empty array []
      *
      * @param patientId
      * @param startDate
      * @param endDate
      */
-    private buildQueryHeartRate(patientId: string, startDate: string, endDate: string): Array<string> {
+    private buildQueryHR(patientId: string, startDate: string, endDate: string): Array<string> {
         const result: Array<string> = []
-        endDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD')
 
+        endDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD')
         for (const m = moment(startDate); m.isBefore(endDate); m.add(1, 'days')) {
             const currentDate: string = m.format('YYYY-MM-DD')
-            result.push(`SELECT min, max, value, calories, type FROM ${Default.MEASUREMENT_HR_NAME}`
-                .concat(` WHERE user_id = '${patientId}' AND time >= '${currentDate}' AND time <= '${currentDate}' ORDER BY time DESC`))
+            const startTime = moment(`${currentDate}T00:00:00`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+            const endTime = moment(`${currentDate}T23:59:59`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+            result.push(
+                `SELECT ROUND(MEAN(value)) as value FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
+                    WHERE user_id = '${patientId}'
+                    AND type = '${TimeSeriesType.HEART_RATE}'
+                    AND time >= '${startTime}'
+                    AND time <= '${endTime}'
+                    GROUP BY time(1m) fill(none) ORDER BY time ASC;`
+            )
+        }
+        return result
+    }
+
+    /**
+     *
+     * @param patientId
+     * @param startDate
+     * @param endDate
+     */
+    private buildQueryCalories(patientId: string, startDate: string, endDate: string): Array<string> {
+        const result: Array<string> = []
+
+        endDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD')
+        for (const m = moment(startDate); m.isBefore(endDate); m.add(1, 'days')) {
+            const currentDate: string = m.format('YYYY-MM-DD')
+            const startTime = moment(`${currentDate}T00:00:00`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+            const endTime = moment(`${currentDate}T23:59:59`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+            result.push(
+                `SELECT SUM(value) as value FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
+                    WHERE user_id = '${patientId}'
+                    AND type = '${TimeSeriesType.CALORIES}'
+                    AND time >= '${startTime}'
+                    AND time <= '${endTime}'
+                    GROUP BY time(1m) fill(none) ORDER BY time ASC;`
+            )
         }
         return result
     }

@@ -2,7 +2,7 @@ import { IntradayTimeSeries } from '../domain/model/intraday.time.series'
 import { IRepository } from './repository.interface'
 
 /**
- * TimeSeries infrastructure interface.
+ * TimeSeries repository interface.
  *
  * @extends {IRepository}
  */

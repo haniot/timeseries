@@ -9,6 +9,7 @@ export abstract class Identifier {
     // Controllers
     public static readonly HOME_CONTROLLER: any = Symbol.for('HomeController')
     public static readonly TIMESERIES_CONTROLLER: any = Symbol.for('TimeSeriesController')
+    public static readonly INTRADAY_CONTROLLER: any = Symbol.for('IntradayController')
 
     // Services
     public static readonly TIMESERIES_SERVICE: any = Symbol.for('TimeSeriesService')
