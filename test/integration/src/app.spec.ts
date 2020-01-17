@@ -9,7 +9,7 @@ const request = require('supertest')(app.getExpress())
 
 describe('App', () => {
     context('general error handler', () => {
-        it('should return status code 404 and an info message about the lack of the route', async () => {
+        it('should return status code 404 and an info message about the lack of the route.', async () => {
             const endPoint = '/v1/patients/5a62be07d6f33400146c9b61/date/2018-06-18/2018-06-19/'
             const resultExpect = {
                 code: 404,
@@ -32,6 +32,15 @@ describe('App', () => {
                     expect(res.body.message).to.equal(Strings.ERROR_MESSAGE.REQUEST_BODY_INVALID)
                     expect(res.body.description).to.equal(Strings.ERROR_MESSAGE.REQUEST_BODY_INVALID_DESC)
                 })
+        })
+    })
+
+    context('', () => {
+        it('should return status code 200 for "GET /v1/reference/".', async () => {
+            const endPoint = '/v1/reference/'
+            const result = await request.get(endPoint)
+
+            expect(result.statusCode).to.equal(200)
         })
     })
 })

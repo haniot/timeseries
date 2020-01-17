@@ -51,10 +51,9 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
      * @param item
      */
     private buildPoints(item: TimeSeries): Array<IPoint> {
-        return item.dataSet.map((entry) => {
-            entry = entry as Item
+        return item.dataSet.map((entry: any) => {
             return {
-                measurement: Default.MEASUREMENT_NAME,
+                measurement: Default.MEASUREMENT_TIMESERIES_NAME,
                 fields: { value: entry.value },
                 tags: {
                     user_id: item.patientId,
@@ -71,12 +70,12 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
      */
     private buildHeartRatePoints(item: TimeSeries): Array<IPoint> {
         const points: Array<IPoint> = []
-        item.dataSet.forEach((value) => {
-            value = value as HeartRateItem
-            points.push(this.buildHeartRateZonePoint(value.zones.outOfRange, value.date, item.patientId))
-            points.push(this.buildHeartRateZonePoint(value.zones.fatBurn, value.date, item.patientId))
-            points.push(this.buildHeartRateZonePoint(value.zones.cardio, value.date, item.patientId))
-            points.push(this.buildHeartRateZonePoint(value.zones.peak, value.date, item.patientId))
+        item.dataSet.forEach((elem) => {
+            elem = elem as HeartRateItem
+            points.push(this.buildHeartRateZonePoint(elem.zones.outOfRange, elem.date, item.patientId))
+            points.push(this.buildHeartRateZonePoint(elem.zones.fatBurn, elem.date, item.patientId))
+            points.push(this.buildHeartRateZonePoint(elem.zones.cardio, elem.date, item.patientId))
+            points.push(this.buildHeartRateZonePoint(elem.zones.peak, elem.date, item.patientId))
         })
         return points
     }
@@ -90,12 +89,12 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
      */
     private buildHeartRateZonePoint(zone: HeartRateZoneData, date: string, patientId: string): IPoint {
         return {
-            measurement: Default.MEASUREMENT_HR_NAME,
+            measurement: Default.MEASUREMENT_HR_ZONES_NAME,
             fields: {
-                value: zone.duration,
-                calories: zone.calories,
                 max: zone.max,
-                min: zone.min
+                min: zone.min,
+                duration: zone.duration,
+                calories: zone.calories
             },
             tags: {
                 user_id: patientId,
@@ -115,13 +114,13 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
         if (!(obj.data_set instanceof Array)) return result
 
         // Verify that the dataset is empty
-        if (!obj.data_set[0].groupRows.length) {
+        if (!obj.data_set.length) {
             return this.mountTimeSeriesDefaultValues(obj.start_date, obj.end_date)
         }
 
-        result.summary = new Summary(obj.data_set[1][0].total)
-        result.dataSet = obj.data_set[0].map(item => {
-            return new Item(item.time.toNanoISOString().split('T')[0], item.value)
+        result.summary = new Summary(obj.total)
+        result.dataSet = obj.data_set.map((item: any) => {
+            return new Item(moment(item.time.toISOString()).utc().format('YYYY-MM-DD'), item.value)
         })
 
         return result
@@ -133,61 +132,86 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
      * @param obj
      */
     private transformHeartRateTimeSeries(obj: any): TimeSeries {
-        const startDate = moment(obj.start_date)
         const timeSeries = new TimeSeries()
-        const summary: HeartRateSummary = new HeartRateSummary()
-        timeSeries.summary = summary
+        timeSeries.summary = new HeartRateSummary()
 
         if (!(obj.data_set instanceof Array)) return timeSeries
 
-        // Verify data_set = { groupRows: [ [Object] ] }
-        if (obj.data_set.groupRows) {
-            const heartRateItem = new HeartRateItem()
-            heartRateItem.zones = new HeartRateZone()
-            heartRateItem.date = startDate.format('YYYY-MM-DD')
-            timeSeries.dataSet = [heartRateItem]
+        const endDate = moment(obj.end_date).add(1, 'day').format('YYYY-MM-DD')
+        let index = 0
 
-            if (obj.data_set.groupRows.length) {
-                heartRateItem.zones = this.buildHeartRateZone(obj.data_set, summary)
-            }
-            return timeSeries
+        for (const m = moment(obj.start_date); m.isBefore(endDate); m.add(1, 'day')) {
+            const heartRateData: Array<any> = (obj.data_set[0] instanceof Array) ? obj.data_set[index] : obj.data_set
+            const caloriesData: Array<any> = (obj.calories[0] instanceof Array) ? obj.calories[index] : obj.calories
+            const currentDate = m.utc().format('YYYY-MM-DD')
+
+            const heartRateZone: HeartRateZone = this.buildHeartRateZone(obj.zones, heartRateData, caloriesData, currentDate)
+            timeSeries.dataSet.push(new HeartRateItem(currentDate, heartRateZone))
+
+            timeSeries.summary.outOfRangeTotal += heartRateZone.outOfRange.duration
+            timeSeries.summary.fatBurnTotal += heartRateZone.fatBurn.duration
+            timeSeries.summary.cardioTotal += heartRateZone.cardio.duration
+            timeSeries.summary.peakTotal += heartRateZone.peak.duration
+
+            index++
         }
 
-        timeSeries.dataSet = obj.data_set.map(_array => {
-            const heartRateItem = new HeartRateItem()
-            heartRateItem.date = startDate.format('YYYY-MM-DD')
-            startDate.add(1, 'days')
-
-            heartRateItem.zones = this.buildHeartRateZone(_array, summary)
-            return heartRateItem
-        })
         return timeSeries
     }
 
-    /**
-     * Builds heart rate zones and increments the total of each zone to the summary.
-     *
-     * @param _array
-     * @param summary
-     */
-    private buildHeartRateZone(_array: Array<any>, summary: HeartRateSummary): HeartRateZone {
-        const heartRateZone = new HeartRateZone()
-        _array.forEach(item => {
-            if (item.type === HeartRateZoneType.OUT_OF_RANGE) {
-                summary.outOfRangeTotal += item.value
-                heartRateZone.outOfRange = new HeartRateZoneData(item.min, item.max, item.value, item.calories)
-            } else if (item.type === HeartRateZoneType.FAT_BURN) {
-                summary.fatBurnTotal += item.value
-                heartRateZone.fatBurn = new HeartRateZoneData(item.min, item.max, item.value, item.calories)
-            } else if (item.type === HeartRateZoneType.CARDIO) {
-                summary.cardioTotal += item.value
-                heartRateZone.cardio = new HeartRateZoneData(item.min, item.max, item.value, item.calories)
-            } else if (item.type === HeartRateZoneType.PEAK) {
-                summary.peakTotal += item.value
-                heartRateZone.peak = new HeartRateZoneData(item.min, item.max, item.value, item.calories)
+    private buildHeartRateZone(zones: any, hrData: Array<any>, calories: Array<any>, currentDate: string): HeartRateZone {
+        const result: HeartRateZone = new HeartRateZone()
+
+        result.outOfRange = this.getZone(zones, HeartRateZoneType.OUT_OF_RANGE, currentDate)
+        result.fatBurn = this.getZone(zones, HeartRateZoneType.FAT_BURN, currentDate)
+        result.cardio = this.getZone(zones, HeartRateZoneType.CARDIO, currentDate)
+        result.peak = this.getZone(zones, HeartRateZoneType.PEAK, currentDate)
+
+        if (hrData) this.buildDurationAndCaloriesHR(hrData, calories, result)
+
+        return result
+    }
+
+    private buildDurationAndCaloriesHR(hrData: Array<any>, calories: Array<any>, heartRateZone: HeartRateZone): HeartRateZone {
+        hrData.forEach(elem => {
+            if (elem.value >= heartRateZone.outOfRange.min && elem.value < heartRateZone.outOfRange.max) {
+                heartRateZone.outOfRange.duration += 60000
+                heartRateZone.outOfRange.calories += this.getCals(calories, elem.time)
+            } else if (elem.value >= heartRateZone.fatBurn.min && elem.value < heartRateZone.fatBurn.max) {
+                heartRateZone.fatBurn.duration += 60000
+                heartRateZone.fatBurn.calories += this.getCals(calories, elem.time)
+            } else if (elem.value >= heartRateZone.cardio.min && elem.value < heartRateZone.cardio.max) {
+                heartRateZone.cardio.duration += 60000
+                heartRateZone.cardio.calories += this.getCals(calories, elem.time)
+            } else if (elem.value >= heartRateZone.peak.min && elem.value < heartRateZone.peak.max) {
+                heartRateZone.peak.duration += 60000
+                heartRateZone.peak.calories += this.getCals(calories, elem.time)
             }
         })
         return heartRateZone
+    }
+
+    private getZone(zones: any, type: string, date: string): HeartRateZoneData {
+        let result = zones.data
+            .find((item: any) => item.time.toISOString().split('T')[0] === date && item.type === type)
+        if (!result) {
+            result = zones.data_default.find((item: any) => {
+                // When the zone is the default, what matters is only the min and max
+                if (item.type === type) {
+                    item.duration = 0
+                    item.calories = 0
+                    return item
+                }
+            })
+        }
+        return new HeartRateZoneData().fromJSON(result)
+    }
+
+    private getCals(calories, hrTime): number {
+        const result = calories.find(el => {
+            return (el.time.getTime() === hrTime.getTime())
+        })
+        return result ? result.value : 0
     }
 
     /**
@@ -199,8 +223,8 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
     private mountTimeSeriesDefaultValues(startDate: string, endDate: string): TimeSeries {
         const result = new TimeSeries()
         result.summary = new Summary()
-        endDate = moment(endDate).add(1, 'days').format('YYYY-MM-DD')
-        for (const m = moment(startDate); m.isBefore(endDate); m.add(1, 'days')) {
+        endDate = moment(endDate).add(1, 'day').format('YYYY-MM-DD')
+        for (const m = moment(startDate); m.isBefore(endDate); m.add(1, 'day')) {
             result.dataSet.push(new Item(m.format('YYYY-MM-DD'), 0))
         }
         return result

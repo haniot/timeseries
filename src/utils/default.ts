@@ -10,13 +10,13 @@
 export abstract class Default {
     public static readonly APP_ID: string = 'timeseries.app'
     public static readonly NODE_ENV: string = 'development' // development, test, production
-    public static readonly PORT_HTTP: number = 9000
-    public static readonly PORT_HTTPS: number = 9001
+    public static readonly PORT_HTTP: number = 8000
+    public static readonly PORT_HTTPS: number = 8001
     public static readonly SWAGGER_URI: string = 'https://api.swaggerhub.com/apis/haniot/timeseries/v1/swagger.json'
     public static readonly LOGO_URI: string = 'https://i.imgur.com/O7PxGWQ.png'
 
-    public static readonly MEASUREMENT_NAME: string = 'timeseries'
-    public static readonly MEASUREMENT_HR_NAME: string = 'timeseries_hr_zones'
+    public static readonly MEASUREMENT_HR_ZONES_NAME: string = 'heart_rate_zones'
+    public static readonly MEASUREMENT_TIMESERIES_NAME: string = 'intraday_timeseries'
 
     // MongoDB
     public static readonly INFLUXDB_URI: string = 'http://127.0.0.1:8086/timeseries'

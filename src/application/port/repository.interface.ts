@@ -1,6 +1,6 @@
 /**
  * Repository interface.
- * Must be implemented by the base repository.
+ * Must be implemented by the base infrastructure.
  *
  * @see {@link BaseRepository} for further information.
  * @template T

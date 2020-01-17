@@ -1,8 +1,8 @@
+import { IPoint } from 'influx'
+
 export class IntradayTimeSeriesEntity {
-    public type?: string
-    public start_time?: string
-    public end_time?: string
-    public total?: number
-    public interval?: string
-    public data_set?: Array<any>
+    constructor(public points: Array<IPoint>, public pointsHrZones?: Array<IPoint>) {
+        this.points = points
+        this.pointsHrZones = pointsHrZones
+    }
 }

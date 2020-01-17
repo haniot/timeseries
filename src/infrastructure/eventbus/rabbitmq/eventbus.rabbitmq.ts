@@ -169,6 +169,6 @@ export class EventBusRabbitMQ implements IEventBus {
     }
 
     public enableLogger(): void {
-        amqpClient.logger('info')
+        amqpClient.logger('warn')
     }
 }

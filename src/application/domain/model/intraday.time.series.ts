@@ -2,28 +2,32 @@ import { IJSONSerializable } from '../utils/json.serializable.interface'
 import { IntradayItem } from './intraday.item'
 import { IntradaySummary } from './intraday.summary'
 import { IntradayHeartRateSummary } from './intraday.heart.rate.summary'
+import { JsonUtils } from '../utils/json.utils'
+import { IJSONDeserializable } from '../utils/json.deserializable.interface'
+import { TimeSeriesType } from '../utils/time.series.type'
+import { HeartRateZone } from './heart.rate.zone'
 
-export class IntradayTimeSeries implements IJSONSerializable {
-    private _data_set: Array<IntradayItem>
+export class IntradayTimeSeries implements IJSONSerializable, IJSONDeserializable<IntradayTimeSeries> {
+    private _dataSet: Array<IntradayItem>
     private _summary: IntradaySummary | IntradayHeartRateSummary
     private _type: string // steps, calories, distance, active_minutes or heart_rate
-    private _patient_id?: string
+    private _patientId: string
 
-    constructor(data_set: Array<IntradayItem>,
-                summary: IntradaySummary | IntradayHeartRateSummary,
-                type: string, patient_id: string) {
-        this._data_set = data_set
-        this._summary = summary
-        this._type = type
-        this._patient_id = patient_id
+    constructor(type?: string, dataSet?: Array<IntradayItem>,
+                summary?: IntradaySummary | IntradayHeartRateSummary,
+                patientId?: string) {
+        this._type = type ? type : ''
+        this._dataSet = dataSet ? dataSet : []
+        this._summary = summary ? summary : new IntradaySummary()
+        this._patientId = patientId ? patientId : ''
     }
 
-    get data_set(): Array<IntradayItem> {
-        return this._data_set
+    get dataSet(): Array<IntradayItem> {
+        return this._dataSet
     }
 
-    set data_set(value: Array<IntradayItem>) {
-        this._data_set = value
+    set dataSet(value: Array<IntradayItem>) {
+        this._dataSet = value
     }
 
     get summary(): IntradaySummary | IntradayHeartRateSummary {
@@ -42,18 +46,43 @@ export class IntradayTimeSeries implements IJSONSerializable {
         this._type = value
     }
 
-    get patient_id(): string | undefined {
-        return this._patient_id
+    get patientId(): string {
+        return this._patientId
     }
 
-    set patient_id(value: string | undefined) {
-        this._patient_id = value
+    set patientId(value: string) {
+        this._patientId = value
     }
 
     public toJSON(): any {
         return {
-            data_set: this.data_set.map(item => item.toJSON()),
-            summary: this.summary.toJSON()
+            summary: this.summary.toJSON(),
+            data_set: this.dataSet.map(item => item.toJSON())
         }
+    }
+
+    public fromJSON(json: any): IntradayTimeSeries {
+        if (!json) return this
+
+        if (JsonUtils.isJsonString(json)) {
+            json = JSON.parse(json)
+        }
+
+        if (json.patient_id) this.patientId = json.patient_id
+        if (json.type) this.type = json.type
+
+        // build data set
+        if (json.data_set instanceof Array) {
+            this.dataSet = json.data_set.map(item => new IntradayItem().fromJSON(item))
+        }
+
+        // build summary
+        if (this.type === TimeSeriesType.HEART_RATE) {
+            this.summary = new IntradayHeartRateSummary()
+            this.summary.zones = new HeartRateZone().fromJSON(json.zones)
+        }
+        if (json.start_time) this.summary.startTime! = json.start_time
+        if (json.end_time) this.summary.endTime! = json.end_time
+        return this
     }
 }

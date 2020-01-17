@@ -11,6 +11,9 @@ import { TimeSeriesType } from '../../../src/application/domain/utils/time.serie
 import { TimeSeriesDBMock } from '../../mocks/time.series.db.mock'
 import { Summary } from '../../../src/application/domain/model/summary'
 import { HeartRateItem } from '../../../src/application/domain/model/heart.rate.item'
+import moment from 'moment'
+import { HeartRateSummary } from '../../../src/application/domain/model/heart.rate.summary'
+import { HeartRateZoneType } from '../../../src/application/domain/utils/heart.rate.zone.type'
 
 describe('MAPPERS: TimeSeriesEntityMapper', () => {
     const mapper: IEntityMapper<TimeSeries, TimeSeriesEntity> = DIContainer.get(Identifier.TIME_SERIES_ENTITY_MAPPER)
@@ -65,7 +68,7 @@ describe('MAPPERS: TimeSeriesEntityMapper', () => {
     context('TRANSFORM json object into TimeSeries.', () => {
         it('should transform the json object of type steps into TimeSeries.', () => {
             const timeSeries: any = new TimeSeriesDBMock()
-                .generate('2018-12-01', '2019-12-01', TimeSeriesType.STEPS)
+                .generate('2018-01-01', '2019-01-01', TimeSeriesType.STEPS)
             const result: TimeSeries = mapper.transform(timeSeries)
 
             assertTimeSeries(timeSeries, result)
@@ -100,52 +103,38 @@ describe('MAPPERS: TimeSeriesEntityMapper', () => {
         })
 
         it('should transform the json object of type heart_rate into TimeSeries.', () => {
-            const timeSeries: any = new TimeSeriesDBMock()
-                .generate('2018-12-01', '2019-12-01', TimeSeriesType.HEART_RATE)
-            const result: TimeSeries = mapper.transform(timeSeries)
-            result.dataSet = result.dataSet as Array<HeartRateItem>
+            const expected: any = new TimeSeriesDBMock()
+                .generate('2019-01-01', '2019-01-07', TimeSeriesType.HEART_RATE)
+            const result: TimeSeries = mapper.transform(expected)
 
-            assert.property(result, 'summary')
-            assert.property(result, 'dataSet')
-
-            for (let i = 0; i < result.dataSet.length; i++) {
-                assert.property(result.dataSet[i], 'zones')
-            }
+            assertTimeSeriesHR(expected, result)
+            assert.lengthOf(result.dataSet, 7)
         })
 
-        it('should turn the json heart rate object into SeriesTemporal for equal start and end dates.', () => {
-            const timeSeries: any = new TimeSeriesDBMock()
+        it('should turn the json heart_rate object into TimeSeries for equal start and end dates.', () => {
+            const expected: any = new TimeSeriesDBMock()
                 .generate('2019-12-01', '2019-12-01', TimeSeriesType.HEART_RATE)
-            const result: TimeSeries = mapper.transform(timeSeries)
+            const result: TimeSeries = mapper.transform(expected)
             result.dataSet = result.dataSet as Array<HeartRateItem>
-            const item: HeartRateItem = result.dataSet[0] as HeartRateItem
 
-            assert.property(result, 'summary')
-            assert.property(result, 'dataSet')
-
-            assert.property(item, 'zones')
-            assert.equal(item.date, '2019-12-01')
-            assert.property(item.zones, 'outOfRange')
-            assert.property(item.zones, 'fatBurn')
-            assert.property(item.zones, 'cardio')
-            assert.property(item.zones, 'peak')
+            assertTimeSeriesHR(expected, result)
             assert.lengthOf(result.dataSet, 1)
         })
 
-        context('groupRows attribute check.', () => {
-            it('should return dataset with defaults objects when groupRows is [].', () => {
-                const timeSeries: any = new TimeSeriesDBMock()
+        context('data_set attribute check.', () => {
+            it('should return dataset with defaults objects when data_set is [].', () => {
+                const expected: any = new TimeSeriesDBMock()
                     .generate('2019-11-01', '2019-12-01', TimeSeriesType.ACTIVE_MINUTES)
 
-                timeSeries.data_set[0].groupRows = []
-                const result: TimeSeries = mapper.transform(timeSeries)
-                const dataSet: Array<Item> = result.dataSet as Array<Item>
+                const expectedDataSet = expected.data_set
+                expected.data_set = []
+                const result: TimeSeries = mapper.transform(expected)
 
                 assert.lengthOf(result.dataSet, 31)
                 for (let i = 0; i < result.dataSet.length; i++) {
-                    const item: any = timeSeries.data_set[0][i]
-                    assert.equal(dataSet[i].date, item.time.toNanoISOString().split('T')[0])
-                    assert.equal(dataSet[i].value, 0)
+                    const item: any = result.dataSet[i]
+                    assert.equal(item.date, moment(expectedDataSet[i].time.toISOString()).utc().format('YYYY-MM-DD'))
+                    assert.equal(item.value, 0)
                 }
             })
         })
@@ -176,7 +165,7 @@ describe('MAPPERS: TimeSeriesEntityMapper', () => {
             assert.propertyVal(result.points[i].fields, 'value', item.value)
             assert.propertyVal(result.points[i].tags, 'user_id', timeSeries.patientId)
             assert.propertyVal(result.points[i].tags, 'type', timeSeries.type)
-            assert.equal(result.points[i].measurement, Default.MEASUREMENT_NAME)
+            assert.equal(result.points[i].measurement, Default.MEASUREMENT_TIMESERIES_NAME)
             assert.equal(result.points[i].timestamp, new Date(item.date).getTime() * 1e+6)
         }
     }
@@ -186,24 +175,42 @@ describe('MAPPERS: TimeSeriesEntityMapper', () => {
             assert.property(result, 'points')
             assert.property(result.points[i].fields, 'min')
             assert.property(result.points[i].fields, 'max')
-            assert.property(result.points[i].fields, 'value')
-            assert.property(result.points[i].fields, 'calories')
             assert.property(result.points[i], 'timestamp')
             assert.propertyVal(result.points[i].tags, 'user_id', hrTimeSeries.patientId)
-            assert.equal(result.points[i].measurement, Default.MEASUREMENT_HR_NAME)
+            assert.equal(result.points[i].measurement, Default.MEASUREMENT_HR_ZONES_NAME)
         }
     }
 
-    const assertTimeSeries = (timeSeries: any, result: TimeSeries) => {
+    const assertTimeSeries = (expected: any, result: TimeSeries) => {
         result.summary = result.summary as Summary
 
         assert.property(result, 'summary')
         assert.property(result, 'dataSet')
-        assert.property(result.summary, 'total')
+        assert.equal(result.summary.total, expected.total)
         for (let i = 0; i < result.dataSet.length; i++) {
-            const item: any = timeSeries.data_set[0][i]
-            assert.propertyVal(result.dataSet[i], 'date', item.time.toNanoISOString().split('T')[0])
-            assert.propertyVal(result.dataSet[i], 'value', item.value)
+            const item: any = result.dataSet[i]
+            assert.equal(item.date, moment(expected.data_set[i].time.toISOString()).utc().format('YYYY-MM-DD'))
+            assert.equal(item.value, expected.data_set[i].value)
+        }
+    }
+
+    const assertTimeSeriesHR = (expected: any, result: TimeSeries) => {
+        result.summary = result.summary as HeartRateSummary
+
+        assert.property(result, 'summary')
+        assert.property(result, 'dataSet')
+        for (let i = 0; i < result.dataSet.length; i++) {
+            const item: HeartRateItem = result.dataSet[i] as HeartRateItem
+            const zones: any = item.zones.toJSON()
+            const expectedDate = expected.data_set[i][0] ? moment(expected.data_set[i][0]
+                .time.toISOString()).utc().format('YYYY-MM-DD') : moment(expected.data_set[i]
+                .time.toISOString()).utc().format('YYYY-MM-DD')
+
+            assert.equal(item.date, expectedDate)
+            assert.property(zones, HeartRateZoneType.OUT_OF_RANGE)
+            assert.property(zones, HeartRateZoneType.FAT_BURN)
+            assert.property(zones, HeartRateZoneType.CARDIO)
+            assert.property(zones, HeartRateZoneType.PEAK)
         }
     }
 })

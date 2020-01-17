@@ -7,6 +7,7 @@ import { Request, Response } from 'express'
 import { ITimeSeriesService } from '../../application/port/timeseries.service.interface'
 import { TimeSeries } from '../../application/domain/model/time.series'
 import { TimeSeriesGroup } from '../../application/domain/model/time.series.group'
+import moment from 'moment'
 
 @controller('/v1/patients/:patient_id')
 export class TimeSeriesController {
@@ -27,32 +28,44 @@ export class TimeSeriesController {
     public async getAllTimeSeries(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: TimeSeriesGroup = await this._timeseriesService
-                .listAll(req.params.patient_id, req.params.start_date, req.params.end_date)
+                .listAll(
+                    req.params.patient_id,
+                    this.buildDate(req.params.start_date),
+                    this.buildDate(req.params.end_date)
+                )
             return res.status(200).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
     }
 
     /**
-     * Retrieve the time series of all supported features associated with a patient except heart rate.
-     * Available resources: steps, calories, distance, active_minutes.
+     * Retrieves the time series of a resource associated with a patient.
      *
-     * @param {Request} req
-     * @param {Response} res
+     * @param req
+     * @param res
      */
     @httpGet('/:resource/date/:start_date/:end_date/timeseries')
     public async getTimeSeriesByType(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: TimeSeries = await this._timeseriesService
-                .listByType(req.params.patient_id, req.params.start_date, req.params.end_date, req.params.resource)
+                .listByType(
+                    req.params.patient_id,
+                    this.buildDate(req.params.start_date),
+                    this.buildDate(req.params.end_date),
+                    req.params.resource
+                )
             return res.status(200).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
-                .send(handlerError.toJson())
+                .send(handlerError.toJSON())
         }
+    }
+
+    private buildDate(date: string): string {
+        return date === 'today' ? moment().format('YYYY-MM-DD') : date
     }
 }

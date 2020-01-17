@@ -1,32 +1,32 @@
 import { IJSONSerializable } from '../utils/json.serializable.interface'
 
 export class IntradaySummary implements IJSONSerializable {
-    private _start_time: string
-    private _end_time: string
+    private _startTime: string
+    private _endTime: string
     private _total: number
     private _interval: string // 1sec, 1min, etc
 
-    constructor(start_time: string, end_time: string, total: number, interval: string) {
-        this._start_time = start_time
-        this._end_time = end_time
-        this._total = total
-        this._interval = interval
+    constructor(startTime?: string, endTime?: string, total?: number, interval?: string) {
+        this._startTime = startTime ? startTime : ''
+        this._endTime = endTime ? endTime : ''
+        this._total = total !== undefined ? total : 0
+        this._interval = interval ? interval : ''
     }
 
-    get start_time(): string {
-        return this._start_time
+    get startTime(): string {
+        return this._startTime
     }
 
-    set start_time(value: string) {
-        this._start_time = value
+    set startTime(value: string) {
+        this._startTime = value
     }
 
-    get end_time(): string {
-        return this._end_time
+    get endTime(): string {
+        return this._endTime
     }
 
-    set end_time(value: string) {
-        this._end_time = value
+    set endTime(value: string) {
+        this._endTime = value
     }
 
     get total(): number {
@@ -47,8 +47,8 @@ export class IntradaySummary implements IJSONSerializable {
 
     public toJSON(): any {
         return {
-            start_time: this.start_time,
-            end_time: this.end_time,
+            start_time: this.startTime,
+            end_time: this.endTime,
             total: this.total,
             interval: this.interval
         }
