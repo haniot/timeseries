@@ -77,12 +77,12 @@ export class IntradayTimeSeries implements IJSONSerializable, IJSONDeserializabl
         }
 
         // build summary
-        if (json.start_time) this.summary.startTime! = json.start_time
-        if (json.end_time) this.summary.endTime! = json.end_time
         if (this.type === TimeSeriesType.HEART_RATE) {
             this.summary = new IntradayHeartRateSummary()
             this.summary.zones = new HeartRateZone().fromJSON(json.zones)
         }
+        if (json.start_time) this.summary.startTime! = json.start_time
+        if (json.end_time) this.summary.endTime! = json.end_time
         return this
     }
 }

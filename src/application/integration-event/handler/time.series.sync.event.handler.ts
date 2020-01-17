@@ -5,7 +5,7 @@ import { ILogger } from '../../../utils/custom.logger'
 import { ITimeSeriesRepository } from '../../port/timeseries.repository.interface'
 import { TimeSeriesSyncEvent } from '../event/time.series.sync.event'
 import { TimeSeries } from '../../domain/model/time.series'
-import { TimeSeriesCreateValidator } from '../../domain/validator/time.series.create.validator'
+import { TimeSeriesSyncValidator } from '../../domain/validator/time.series.sync.validator'
 
 export class TimeSeriesSyncEventHandler implements IIntegrationEventHandler<TimeSeriesSyncEvent> {
 
@@ -18,10 +18,10 @@ export class TimeSeriesSyncEventHandler implements IIntegrationEventHandler<Time
     public async handle(event: TimeSeriesSyncEvent): Promise<void> {
         try {
             const timeSeries: TimeSeries = new TimeSeries().fromJSON(event.timeseries)
-            TimeSeriesCreateValidator.validate(timeSeries)
+            TimeSeriesSyncValidator.validate(timeSeries)
 
             await this._timeSeriesRepository.create(timeSeries)
-            this._logger.info(`Action for event ${event.event_name} and user id ${timeSeries.patientId} executed successfully!!`)
+            this._logger.info(`Action for event ${event.event_name} and user id ${timeSeries.patientId} executed successfully!`)
         } catch (err) {
             this._logger.warn(`An error occurred while attempting `
                 .concat(`to perform the operation with the event: ${JSON.stringify(event)}. Error: ${err.message}`)

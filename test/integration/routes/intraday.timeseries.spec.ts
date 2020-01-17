@@ -75,22 +75,26 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 const result = await Promise.all(requests)
 
                 // steps
+                intradaySteps.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[0].statusCode).to.equal(200)
                 expect(result[0].body).to.deep.equal(intradaySteps.toJSON())
 
-                // calories
+                // // calories
+                intradayCalories.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[1].statusCode).to.equal(200)
                 expect(result[1].body).to.deep.equal(intradayCalories.toJSON())
 
                 // distance
+                intradayDistance.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[2].statusCode).to.equal(200)
                 expect(result[2].body).to.deep.equal(intradayDistance.toJSON())
 
                 // active_minutes
+                intradayActiveMinutes.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[3].statusCode).to.equal(200)
                 expect(result[3].body).to.deep.equal(intradayActiveMinutes.toJSON())
 
-                // heart_rate
+                // // heart_rate
                 const expected = intradayHeartRate.toJSON()
                 expected.summary.zones = zonesExpected
                 expect(result[4].statusCode).to.equal(200)
@@ -110,23 +114,32 @@ describe('CONTROLLER: intraday.timeseries', () => {
 
                 // steps
                 expect(result[0].statusCode).to.equal(200)
-                expect(result[0].body.summary).to.deep.equal({ ...intradaySteps.toJSON().summary, ...{ interval: '15m' } })
+                expect(result[0].body.summary).to.deep.equal({
+                    ...intradaySteps.toJSON().summary, ...{ interval: '15m', end_time: '2019-07-01T23:45:00' }
+                })
                 expect(result[0].body.data_set).to.deep.equal(buildDatasetInterval(intradaySteps.toJSON().data_set, '15m'))
 
                 // calories
                 expect(result[1].statusCode).to.equal(200)
-                expect(result[1].body.summary).to.deep.equal({ ...intradayCalories.toJSON().summary, ...{ interval: '15m' } })
+                expect(result[1].body.summary).to.deep.equal({
+                    ...intradayCalories.toJSON().summary, ...{ interval: '15m' }, end_time: '2019-07-01T23:45:00'
+                })
                 expect(result[1].body.data_set).to.deep.equal(buildDatasetInterval(intradayCalories.toJSON().data_set, '15m'))
 
                 // calories
                 expect(result[2].statusCode).to.equal(200)
-                expect(result[2].body.summary).to.deep.equal({ ...intradayDistance.toJSON().summary, ...{ interval: '15m' } })
+                expect(result[2].body.summary).to.deep.equal(
+                    {
+                        ...intradayDistance.toJSON().summary, ...{
+                            interval: '15m', end_time: '2019-07-01T23:45:00'
+                        }
+                    })
                 expect(result[2].body.data_set).to.deep.equal(buildDatasetInterval(intradayDistance.toJSON().data_set, '15m'))
 
                 // active_minutes
                 expect(result[3].statusCode).to.equal(200)
                 expect(result[3].body.summary).to.deep.equal(
-                    { ...intradayActiveMinutes.toJSON().summary, ...{ interval: '15m' } }
+                    { ...intradayActiveMinutes.toJSON().summary, ...{ interval: '15m' }, end_time: '2019-07-01T23:45:00' }
                 )
                 expect(result[3].body.data_set).to.deep.equal(
                     buildDatasetInterval(intradayActiveMinutes.toJSON().data_set, '15m')
@@ -136,6 +149,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 const hrExpected = intradayHeartRate.toJSON()
                 hrExpected.summary.zones = zonesExpected
                 hrExpected.summary.interval = '15s'
+                hrExpected.summary.end_time = '2019-07-01T23:59:45'
                 hrExpected.data_set = buildDatasetInterval(intradayHeartRate.toJSON().data_set, '15s', TimeSeriesType.HEART_RATE)
                 expect(result[4].statusCode).to.equal(200)
                 assertTimeSeriesHeartRate(result[4].body, hrExpected)
@@ -152,18 +166,22 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 const result = await Promise.all(requests)
 
                 // steps
+                intradaySteps.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[0].statusCode).to.equal(200)
                 expect(result[0].body).to.deep.equal(intradaySteps.toJSON())
 
                 // calories
+                intradayCalories.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[1].statusCode).to.equal(200)
                 expect(result[1].body).to.deep.equal(intradayCalories.toJSON())
 
                 // distance
+                intradayDistance.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[2].statusCode).to.equal(200)
                 expect(result[2].body).to.deep.equal(intradayDistance.toJSON())
 
                 // active_minutes
+                intradayActiveMinutes.summary.endTime! = '2019-07-01T23:59:00'
                 expect(result[3].statusCode).to.equal(200)
                 expect(result[3].body).to.deep.equal(intradayActiveMinutes.toJSON())
 
@@ -172,6 +190,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 expected.summary.zones = zonesExpected
                 expected.data_set = hrDataSetMinutes
                 expected.summary.interval = '1m'
+                expected.summary.end_time = '2019-07-01T23:59:00'
                 expect(result[4].statusCode).to.equal(200)
                 assertTimeSeriesHeartRate(result[4].body, expected)
             })
@@ -187,21 +206,25 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 const result = await Promise.all(requests)
 
                 // steps
+                intradaySteps.summary.endTime! = '2019-07-01T23:45:00'
                 expect(result[0].statusCode).to.equal(200)
                 expect(result[0].body.data_set).to.deep.equal(
                     buildDatasetInterval(intradaySteps.toJSON().data_set, '15m'))
 
                 // calories
+                intradayCalories.summary.endTime! = '2019-07-01T23:45:00'
                 expect(result[1].statusCode).to.equal(200)
                 expect(result[1].body.data_set).to.deep.equal(
                     buildDatasetInterval(intradayCalories.toJSON().data_set, '15m'))
 
                 // distance
+                intradayDistance.summary.endTime! = '2019-07-01T23:45:00'
                 expect(result[2].statusCode).to.equal(200)
                 expect(result[2].body.data_set).to.deep.equal(
                     buildDatasetInterval(intradayDistance.toJSON().data_set, '15m'))
 
                 // active_minutes
+                intradayActiveMinutes.summary.endTime! = '2019-07-01T23:45:00'
                 expect(result[3].statusCode).to.equal(200)
                 expect(result[3].body.data_set).to.deep.equal(
                     buildDatasetInterval(intradayActiveMinutes.toJSON().data_set, '15m'))
@@ -209,7 +232,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 // heart_rate
                 expect(result[4].statusCode).to.equal(200)
                 expect(result[4].body.summary.start_time).to.equal(intradayHeartRate.summary.startTime)
-                expect(result[4].body.summary.end_time).to.equal(intradayHeartRate.summary.endTime)
+                expect(result[4].body.summary.end_time).to.equal('2019-07-01T23:45:00')
                 expect(result[4].body.summary.zones).to.deep.equal(zonesExpected)
                 expect(result[4].body.data_set).to.deep.equal(
                     buildDatasetInterval(intradayHeartRate.toJSON().data_set, '15m', TimeSeriesType.HEART_RATE)
@@ -388,6 +411,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 )
 
                 // calories
+                intradayCalories.summary.endTime = '2020-11-01T23:59:00'
                 expect(result[1].statusCode).to.equal(200)
                 expect(result[1].body).to.deep.equal(intradayCalories.toJSON())
 
@@ -401,12 +425,13 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 )
 
                 // active_minutes
+                intradayActiveMinutes.summary.endTime! = '2020-11-01T23:59:00'
                 expect(result[3].statusCode).to.equal(200)
                 expect(result[3].body).to.deep.equal(intradayActiveMinutes.toJSON())
 
                 // heart_rate
                 expect(result[4].statusCode).to.equal(200)
-                expect(result[4].body.data_set.length).to.equal(86399)
+                expect(result[4].body.data_set.length).to.equal(86400)
                 expect(result[4].body.data_set).to.deep.equal(intradayHeartRate.toJSON().data_set)
                 expect(result[4].body.summary.zones).to.deep.equal(zonesExpected)
             })
@@ -474,6 +499,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 )
 
                 // calories
+                intradayCalories.summary.endTime! = '2020-11-01T23:59:00'
                 expect(result[1].statusCode).to.equal(200)
                 expect(result[1].body).to.deep.equal(intradayCalories.toJSON())
 
@@ -487,6 +513,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 )
 
                 // active_minutes
+                intradayActiveMinutes.summary.endTime! = '2020-11-01T23:59:00'
                 expect(result[3].statusCode).to.equal(200)
                 expect(result[3].body).to.deep.equal(intradayActiveMinutes.toJSON())
 
@@ -599,7 +626,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/active_minutes/date/20200101/2020-11-01' +
                             '/time/00:00/23:59:59/interval/1m/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/heart_rate/date/2020-11-01/2019-15-01' +
-                            '/time/00:00:00/23:59:59/interval/1m/timeseries'),
+                            '/time/00:00:00/23:59:59/interval/1m/timeseries')
                     ]
                     const result = await Promise.all(requests)
 

@@ -85,7 +85,8 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
 
         startTime = moment(`${startDate}T${startTime}`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
         endTime = moment(`${endDate}T${endTime}`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
-        if (moment().diff(endTime, 'days') === 0) {
+        if (moment(moment(startTime).utc().format(`YYYY-MM-DD`)).isSame(moment()
+            .format(`YYYY-MM-DD`), 'day')) {
             endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
         }
 

@@ -190,8 +190,8 @@ function createEventFake(name: string, item?: any): IntegrationEvent<any> {
 
 function createHandlerEventFake(): IIntegrationEventHandler<any> {
     return {
-        handle(event: any): void {
-            // not implemented
+        handle(event: any): Promise<void> {
+            return Promise.resolve()
         }
     }
 }

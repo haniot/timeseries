@@ -31,6 +31,12 @@ export class IntradayTimeSeriesMock {
 
         const intervalValue = parseInt(interval.slice(0, -1), 10)
         const intervalUnit = interval.slice(-1) === 's' ? 'seconds' : 'minutes'
+
+        if (moment(moment(startTime).utc().format(`YYYY-MM-DD`)).isSame(moment()
+            .format(`YYYY-MM-DD`), 'day')) {
+            endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+        }
+        // endTime = moment(endTime).add(1, 'minute').format()
         for (const current = moment(startTime); current.isBefore(endTime); current.add(intervalValue, intervalUnit)) {
             let random = 0
             if (timeSeries.type === TimeSeriesType.STEPS) {
@@ -48,13 +54,13 @@ export class IntradayTimeSeriesMock {
         return timeSeries
     }
 
-    private generateHeartRateIntradayTimeSeries(startDate: string, endDate: string, interval: string): IntradayTimeSeries {
+    private generateHeartRateIntradayTimeSeries(startTime: string, endTime: string, interval: string): IntradayTimeSeries {
         const timeSeries = new IntradayTimeSeries()
         timeSeries.type = TimeSeriesType.HEART_RATE
         timeSeries.patientId = this.generateObjectId()
         timeSeries.summary = new IntradayHeartRateSummary()
-        timeSeries.summary.startTime = startDate
-        timeSeries.summary.endTime = endDate
+        timeSeries.summary.startTime = startTime
+        timeSeries.summary.endTime = endTime
         timeSeries.summary.min = Number.MAX_SAFE_INTEGER
         timeSeries.summary.max = Number.MIN_SAFE_INTEGER
         timeSeries.summary.interval = interval
@@ -62,8 +68,11 @@ export class IntradayTimeSeriesMock {
 
         const intervalValue = parseInt(interval.slice(0, -1), 10)
         const intervalUnit = interval.slice(-1) === 's' ? 'seconds' : 'minutes'
-        // endDate = moment(endDate).add(1, 'minute').format()
-        for (const current = moment(startDate); current.isBefore(endDate); current.add(intervalValue, intervalUnit)) {
+        if (moment(startTime).utc().isSame(moment().utc(), 'day')) {
+            endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+        }
+        if(interval === '1s') endTime = moment(endTime).add(1, 'second').format()
+        for (const current = moment(startTime); current.isBefore(endTime); current.add(intervalValue, intervalUnit)) {
             const random = Math.floor((Math.random() * 201)) + 30 // 30-200
 
             sum += random
@@ -80,7 +89,7 @@ export class IntradayTimeSeriesMock {
 
     private getHeartRateZone(_array: Array<IntradayItem>): HeartRateZone {
         const heartRateZone = new HeartRateZone(
-            new HeartRateZoneData(30, 91, 0, 0, HeartRateZoneType.OUT_OF_RANGE),
+            new HeartRateZoneData(30, 91,   0, 0, HeartRateZoneType.OUT_OF_RANGE),
             new HeartRateZoneData(91, 127, 0, 0, HeartRateZoneType.FAT_BURN),
             new HeartRateZoneData(127, 154, 0, 0, HeartRateZoneType.CARDIO),
             new HeartRateZoneData(154, 220, 0, 0, HeartRateZoneType.PEAK)

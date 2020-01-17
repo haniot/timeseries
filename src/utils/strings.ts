@@ -30,8 +30,11 @@ export abstract class Strings {
         VALIDATE: {
             REQUIRED_FIELDS: 'Required fields were not provided...',
             REQUIRED_FIELDS_DESC: '{0} are required!',
-            VALUE: 'Value {0} is not valid!',
-            VALUE_DESC: 'Must be a number equal to or greater than zero...'
+            REQUIRED_FIELDS_NOT_VALID: 'Fields: {0} do not exist or do not have valid values.',
+            INVALID_NUMBER: 'Value {0} is not valid!',
+            POSITIVE_NUMBER: 'The value must be a number equal to or greater than zero.',
+            POSITIVE_INTEGER: 'The value must be an integer equal to or greater than zero.',
+            NUMBER_GREATER_ZERO: 'The value must be greater than zero.'
         },
         DATE: {
             YEAR_NOT_ALLOWED: 'Date {0} has year not allowed. The year must be greater than 1678 and less than 2261.',

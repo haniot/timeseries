@@ -9,7 +9,6 @@ export class UserValidator {
 
         if (!item.id) fields.push('id')
         else ObjectIdValidator.validate(item.id)
-        if (!item.type) fields.push('type')
 
         if (fields.length) {
             throw new ValidationException(

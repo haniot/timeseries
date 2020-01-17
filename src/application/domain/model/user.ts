@@ -4,8 +4,9 @@ import { IJSONDeserializable } from '../utils/json.deserializable.interface'
 export class User extends Entity implements IJSONDeserializable<User> {
     private _type?: string
 
-    constructor() {
-        super()
+    constructor(id?: string, type?: string) {
+        super(id)
+        this._type = type
     }
 
     get type(): string | undefined {

@@ -118,9 +118,10 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
             return this.mountTimeSeriesDefaultValues(obj.type, obj.start_time, obj.end_time, obj.interval)
         }
 
+        const timestamps = this.buildTimeStamps(obj.start_time, obj.end_time, obj.data_set)
         result.summary = new IntradaySummary(
-            moment(obj.start_time).utc().format('YYYY-MM-DDTHH:mm:ss'),
-            moment(obj.end_time).utc().format('YYYY-MM-DDTHH:mm:ss'),
+            timestamps.start_time,
+            timestamps.end_time,
             obj.total,
             obj.interval
         )
@@ -140,9 +141,10 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
         const result = new IntradayTimeSeries()
         if (!(obj.data_set instanceof Array)) return result
 
+        const timestamps = this.buildTimeStamps(obj.start_time, obj.end_time, obj.data_set)
         result.summary = new IntradayHeartRateSummary(
-            moment(obj.start_time).utc().format('YYYY-MM-DDTHH:mm:ss'),
-            moment(obj.end_time).utc().format('YYYY-MM-DDTHH:mm:ss'),
+            timestamps.start_time,
+            timestamps.end_time,
             obj.min,
             obj.max,
             obj.average,
@@ -233,9 +235,42 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
                 .format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
             startTime = moment(startTime).utc().set({ seconds: 0 }).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
         }
+        if (moment(moment(startTime).utc().format(`YYYY-MM-DD`)).isSame(moment()
+            .format(`YYYY-MM-DD`), 'day')) {
+            endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+        }
         for (const m = moment(startTime).utc(); m.utc().isBefore(endTime); m.utc().add(intervalValue, intervalUnit)) {
             result.dataSet.push(new IntradayItem(m.utc().format('HH:mm:ss'), 0))
         }
         return result
     }
+
+    /**
+     * Use parameters to build start_time and end_time.
+     *
+     * @param startTime
+     * @param endTime
+     * @param dataSet
+     */
+    private buildTimeStamps(startTime: any, endTime: any, dataSet: Array<any>): any {
+        const result = (_start, _end) => {
+            return {
+                start_time: _start.utc().format('YYYY-MM-DDTHH:mm:ss'),
+                end_time: _end.utc().format('YYYY-MM-DDTHH:mm:ss')
+            }
+        }
+        if (!dataSet.length) return result(moment(startTime), moment(endTime))
+
+        const startDate = startTime.split('T')[0]
+        const endDate = endTime.split('T')[0]
+        const _startTime = dataSet[0].time ?
+            moment(`${startDate}T${moment(dataSet[0].time.toISOString()).utc().format('HH:mm:ss')}Z`) :
+            moment(startTime)
+        const _endTime = dataSet[dataSet.length - 1].time ?
+            moment(`${endDate}T${moment(dataSet[dataSet.length - 1].time.toISOString()).utc().format('HH:mm:ss')}Z`) :
+            moment(endTime)
+
+        return result(_startTime, _endTime)
+    }
+
 }

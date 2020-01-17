@@ -10,6 +10,8 @@ import { UserDeleteEventHandler } from '../../application/integration-event/hand
 import { DIContainer } from '../../di/di'
 import { TimeSeriesSyncEvent } from '../../application/integration-event/event/time.series.sync.event'
 import { TimeSeriesSyncEventHandler } from '../../application/integration-event/handler/time.series.sync.event.handler'
+import { IntradayTimeSeriesSyncEvent } from '../../application/integration-event/event/intraday.time.series.sync.event'
+import { IntradayTimeSeriesSyncEventHandler } from '../../application/integration-event/handler/intraday.time.series.sync.event.handler'
 
 @injectable()
 export class SubscribeEventBusTask implements IBackgroundTask {
@@ -82,6 +84,20 @@ export class SubscribeEventBusTask implements IBackgroundTask {
                 })
                 .catch(err => {
                     this._logger.error(`Error in Subscribe TimeSeriesSyncEvent! ${err.message}`)
+                })
+
+            // Subscribe in TimeSeriesSyncEvent
+            this._eventBus
+                .subscribe(
+                    new IntradayTimeSeriesSyncEvent(),
+                    new IntradayTimeSeriesSyncEventHandler(DIContainer.get(Identifier.INTRADAY_REPOSITORY), this._logger),
+                    IntradayTimeSeriesSyncEvent.ROUTING_KEY
+                )
+                .then((result: boolean) => {
+                    if (result) this._logger.info('Subscribe in IntradayTimeSeriesSyncEvent successful!')
+                })
+                .catch(err => {
+                    this._logger.error(`Error in Subscribe IntradayTimeSeriesSyncEvent! ${err.message}`)
                 })
         } catch (err) {
             this._logger.error(`An error occurred while subscribing to events. ${err.message}`)

@@ -61,7 +61,7 @@ describe('MAPPERS: IntradayTimeSeriesEntityMapper', () => {
 
             assertTimeSeriesEntity(timeSeries, result)
             assertHeartRateIntradayTimeSeriesEntity(result)
-            assert.lengthOf(result.points, 60)
+            assert.lengthOf(result.points, 61)
         })
     })
 
@@ -69,6 +69,7 @@ describe('MAPPERS: IntradayTimeSeriesEntityMapper', () => {
         it('should transform the json object of type steps into TimeSeries.', () => {
             const timeSeries: any = new IntradayTimeSeriesDBMock()
                 .generate('2020-01-06T03:00:00', '2020-01-07T02:59:59', '1m', TimeSeriesType.STEPS)
+            timeSeries.end_time = '2020-01-07T02:59:00'
             const result: IntradayTimeSeries = mapper.transform(timeSeries)
 
             assertTimeSeries(timeSeries, result)
@@ -77,29 +78,32 @@ describe('MAPPERS: IntradayTimeSeriesEntityMapper', () => {
 
         it('should transform the json object of type distance into IntradayTimeSeries.', () => {
             const timeSeries: any = new IntradayTimeSeriesDBMock()
-                .generate('2020-01-06T03:00:00', '2020-01-06T03:10:00', '1m', TimeSeriesType.DISTANCE)
+                .generate('2020-01-06T03:00:00', '2020-01-06T03:10:59', '1m', TimeSeriesType.DISTANCE)
+            timeSeries.end_time = '2020-01-06T03:10:00'
             const result: IntradayTimeSeries = mapper.transform(timeSeries)
 
             assertTimeSeries(timeSeries, result)
-            assert.lengthOf(result.dataSet, 10)
+            assert.lengthOf(result.dataSet, 11)
         })
 
         it('should transform the json object of type calories into IntradayTimeSeries.', () => {
             const timeSeries: any = new IntradayTimeSeriesDBMock()
-                .generate('2020-01-06T03:00:00', '2020-01-06T04:00:00', '1m', TimeSeriesType.CALORIES)
+                .generate('2020-01-06T03:00:00', '2020-01-06T04:00:59', '1m', TimeSeriesType.CALORIES)
+            timeSeries.end_time = '2020-01-06T04:00:00'
             const result: IntradayTimeSeries = mapper.transform(timeSeries)
 
             assertTimeSeries(timeSeries, result)
-            assert.lengthOf(result.dataSet, 60)
+            assert.lengthOf(result.dataSet, 61)
         })
 
         it('should transform the json object of type active_minutes into IntradayTimeSeries.', () => {
             const timeSeries: any = new IntradayTimeSeriesDBMock()
-                .generate('2020-01-06T03:00:00', '2020-01-06T03:15:00', '1m', TimeSeriesType.ACTIVE_MINUTES)
+                .generate('2020-01-06T03:00:00', '2020-01-06T03:15:59', '1m', TimeSeriesType.ACTIVE_MINUTES)
+            timeSeries.end_time = '2020-01-06T03:15:00'
             const result: IntradayTimeSeries = mapper.transform(timeSeries)
 
             assertTimeSeries(timeSeries, result)
-            assert.lengthOf(result.dataSet, 15)
+            assert.lengthOf(result.dataSet, 16)
         })
 
         it('should transform the json object of type heart_rate into IntradayTimeSeries.', () => {

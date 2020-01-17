@@ -51,8 +51,7 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
      * @param item
      */
     private buildPoints(item: TimeSeries): Array<IPoint> {
-        return item.dataSet.map((entry) => {
-            entry = entry as Item
+        return item.dataSet.map((entry: any) => {
             return {
                 measurement: Default.MEASUREMENT_TIMESERIES_NAME,
                 fields: { value: entry.value },

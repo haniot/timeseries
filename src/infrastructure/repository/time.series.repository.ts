@@ -37,7 +37,7 @@ export class TimeSeriesRepository implements ITimeSeriesRepository {
 
             // Preparing the measure to be entered all at once
             this._db.connection
-                .writePoints((this._mapper.transform(item) as TimeSeriesEntity).points)
+                .writePoints(this._mapper.transform(item).points)
                 .then((result) => resolve())
                 .catch((err) => {
                     this._logger.error(err)
