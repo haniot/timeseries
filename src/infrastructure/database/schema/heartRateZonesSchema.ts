@@ -6,7 +6,7 @@ export const heartRateZonesSchema: ISchemaOptions = {
     fields: {
         max: FieldType.INTEGER,
         min: FieldType.INTEGER,
-        value: FieldType.INTEGER,
+        duration: FieldType.INTEGER,
         calories: FieldType.FLOAT
     },
     tags: [
