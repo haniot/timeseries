@@ -72,7 +72,11 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
     }
 
     public listByInterval(patientId: string, type: string, date: string, interval: string): Promise<IntradayTimeSeries> {
-        return this.listByIntervalAndTime(patientId, type, date, date, '00:00:00', '23:59:59', interval)
+        let endTime = '23:59:59'
+        if (moment(date).isSame(new Date(), 'day')) {
+            endTime = moment().format('HH:mm:ss')
+        }
+        return this.listByIntervalAndTime(patientId, type, date, date, '00:00:00', endTime, interval)
     }
 
     public listByIntervalAndTime(patientId: string, type: string,
@@ -85,10 +89,6 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
 
         startTime = moment(`${startDate}T${startTime}`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
         endTime = moment(`${endDate}T${endTime}`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
-        if (moment(moment(startTime).utc().format(`YYYY-MM-DD`)).isSame(moment()
-            .format(`YYYY-MM-DD`), 'day')) {
-            endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
-        }
 
         const offsetInterval: string = interval.includes('m') ? `${moment(startTime).get('minutes')}m` :
             `${moment(startTime).get('seconds')}s`
@@ -113,6 +113,7 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
                               interval: string, offsetInterval: string): Promise<IntradayTimeSeries> {
         return new Promise<IntradayTimeSeries>(async (resolve, reject) => {
             const query: Array<string> = this.buildQuery(patientId, type, startTime, endTime, interval, offsetInterval)
+
             this._db.connection!.query(query)
                 .then((res: Array<any>) => {
                     const result: any = { type, interval, start_time: startTime, end_time: endTime, total: 0 }
@@ -140,7 +141,6 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
                                 interval: string, offsetInterval: string): Promise<IntradayTimeSeries> {
         return new Promise<IntradayTimeSeries>(async (resolve, reject) => {
             const query: Array<string> = this.buildQueryHeartRate(patientId, startTime, endTime, interval, offsetInterval)
-
             this._db.connection!.query(query)
                 .then(async (res: Array<any>) => {
                     const result: any = {
@@ -264,11 +264,12 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
                 AND time >= '${startTime}'
                 AND time <= '${endTime}'
                 GROUP BY time(${interval}, ${offsetInterval}) fill(none) ORDER BY time ASC;`,
-            `SELECT MIN(value), MAX(value), ROUND(MEAN(value)) as average FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
+            `SELECT MIN(value), MAX(value), ROUND(MEAN(value)) as average FROM (SELECT ROUND(MEAN(value)) as value
+                FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
                 WHERE user_id = '${patientId}'
                 AND type = '${TimeSeriesType.HEART_RATE}'
                 AND time >= '${startTime}'
-                AND time <= '${endTime}';`,
+                AND time <= '${endTime}' GROUP BY time(${interval}, ${offsetInterval}) fill(none));`,
             `SELECT SUM(value) as value FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
                 WHERE user_id = '${patientId}'
                 AND type = '${TimeSeriesType.CALORIES}'

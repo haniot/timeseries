@@ -85,9 +85,9 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
      * NOTE: calories and duration are not saved to the intraday
      * because the intraday has the information needed to return this information.
      *
-     * @param zone
-     * @param date
-     * @param patientId
+     * @param zone Object representing a Heart Rate Zone
+     * @param date YYYY-MM-DD
+     * @param patientId ID of the patient
      */
     private buildHeartRateZonePoint(zone: HeartRateZoneData, date: string, patientId: string): IPoint {
         return {
@@ -158,6 +158,13 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
         return result
     }
 
+    /**
+     * Build object with Heart Rate zones.
+     *
+     * @param zones
+     * @param hr
+     * @param calories
+     */
     private buildHeartRateZone(zones: Array<any>, hr: Array<any>, calories: Array<any>): HeartRateZone {
         const result: HeartRateZone = new HeartRateZone()
 
@@ -184,6 +191,13 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
         return result
     }
 
+    /**
+     * Build objects with zones containing durations and calories according to the heart rate array.
+     *
+     * @param hrData
+     * @param calories
+     * @param heartRateZone
+     */
     private buildDurationAndCaloriesHR(hr: Array<any>, calories: Array<any>, heartRateZone: HeartRateZone): HeartRateZone {
         hr.forEach(elem => {
             if (elem.value >= heartRateZone.outOfRange.min && elem.value < heartRateZone.outOfRange.max) {
@@ -203,6 +217,12 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
         return heartRateZone
     }
 
+    /**
+     * Recovers calorie value according to time.
+     *
+     * @param calories Array<any> Object array containing calories
+     * @param hrTime HH:mm:ss
+     */
     private getCals(calories, hrTime): number {
         const result = calories.find(el => {
             return (el.time.getTime() === hrTime.getTime())
@@ -235,10 +255,10 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
                 .format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
             startTime = moment(startTime).utc().set({ seconds: 0 }).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
         }
-        if (moment(moment(startTime).utc().format(`YYYY-MM-DD`)).isSame(moment()
-            .format(`YYYY-MM-DD`), 'day')) {
-            endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
-        }
+        // if (moment(moment(startTime).utc().format(`YYYY-MM-DD`)).isSame(moment()
+        //     .format(`YYYY-MM-DD`), 'day')) {
+        //     endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
+        // }
         for (const m = moment(startTime).utc(); m.utc().isBefore(endTime); m.utc().add(intervalValue, intervalUnit)) {
             result.dataSet.push(new IntradayItem(m.utc().format('HH:mm:ss'), 0))
         }
@@ -272,5 +292,4 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
 
         return result(_startTime, _endTime)
     }
-
 }

@@ -719,8 +719,8 @@ describe('CONTROLLER: intraday.timeseries', () => {
 })
 
 function assertTimeSeriesHeartRate(result: any, expected: any) {
-    expect(result.summary.min).to.equal(expected.summary.min)
-    expect(result.summary.max).to.equal(expected.summary.max)
+    expect(result.summary.min).to.equal(getMin(result.data_set))
+    expect(result.summary.max).to.equal(getMax(result.data_set))
     expect(result.summary.average).to.equal(expected.summary.average)
     expect(result.summary.interval).to.equal(expected.summary.interval)
     expect(result.summary.start_time).to.equal(expected.summary.start_time)
@@ -728,6 +728,14 @@ function assertTimeSeriesHeartRate(result: any, expected: any) {
     expect(result.data_set.length).to.equal(expected.data_set.length)
     expect(result.summary.zones).to.deep.equal(expected.summary.zones)
     expect(result.data_set).to.deep.equal(expected.data_set)
+}
+
+function getMin(data) {
+    return data.reduce((min, p) => p.value < min ? p.value : min, data[0].value)
+}
+
+function getMax(data) {
+    return data.reduce((max, p) => p.value > max ? p.value : max, data[0].value)
 }
 
 async function addIntradayTimeSeries(intradayTimeSeries: IntradayTimeSeries): Promise<void> {
