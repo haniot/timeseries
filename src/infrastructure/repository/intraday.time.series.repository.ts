@@ -72,7 +72,11 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
     }
 
     public listByInterval(patientId: string, type: string, date: string, interval: string): Promise<IntradayTimeSeries> {
-        return this.listByIntervalAndTime(patientId, type, date, date, '00:00:00', '23:59:59', interval)
+        let endTime = '23:59:59'
+        if (moment(date).isSame(new Date(), 'day')) {
+            endTime = moment().format(`HH:mm:ss`)
+        }
+        return this.listByIntervalAndTime(patientId, type, date, date, '00:00:00', endTime, interval)
     }
 
     public listByIntervalAndTime(patientId: string, type: string,
@@ -85,10 +89,6 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
 
         startTime = moment(`${startDate}T${startTime}`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
         endTime = moment(`${endDate}T${endTime}`).format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
-        if (moment(moment(startTime).utc().format(`YYYY-MM-DD`)).isSame(moment()
-            .format(`YYYY-MM-DD`), 'day')) {
-            endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
-        }
 
         const offsetInterval: string = interval.includes('m') ? `${moment(startTime).get('minutes')}m` :
             `${moment(startTime).get('seconds')}s`
