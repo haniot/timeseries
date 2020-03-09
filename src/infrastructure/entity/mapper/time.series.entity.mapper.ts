@@ -159,6 +159,14 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
         return timeSeries
     }
 
+    /**
+     * Build object with Heart Rate zones.
+     *
+     * @param zones
+     * @param hrData
+     * @param calories
+     * @param currentDate
+     */
     private buildHeartRateZone(zones: any, hrData: Array<any>, calories: Array<any>, currentDate: string): HeartRateZone {
         const result: HeartRateZone = new HeartRateZone()
 
@@ -172,6 +180,13 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
         return result
     }
 
+    /**
+     * Build objects with zones containing durations and calories according to the heart rate array.
+     *
+     * @param hrData
+     * @param calories
+     * @param heartRateZone
+     */
     private buildDurationAndCaloriesHR(hrData: Array<any>, calories: Array<any>, heartRateZone: HeartRateZone): HeartRateZone {
         hrData.forEach(elem => {
             if (elem.value >= heartRateZone.outOfRange.min && elem.value < heartRateZone.outOfRange.max) {
@@ -191,6 +206,13 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
         return heartRateZone
     }
 
+    /**
+     * Recovers the zone according to the date and type of zone.
+     *
+     * @param zones Object representing the zones
+     * @param type Zone type
+     * @param date YYYY-MM-DD
+     */
     private getZone(zones: any, type: string, date: string): HeartRateZoneData {
         let result = zones.data
             .find((item: any) => item.time.toISOString().split('T')[0] === date && item.type === type)
@@ -207,8 +229,14 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
         return new HeartRateZoneData().fromJSON(result)
     }
 
+    /**
+     * Recovers calorie value according to time.
+     *
+     * @param calories Array<any> Object array containing calories
+     * @param hrTime HH:mm:ss
+     */
     private getCals(calories, hrTime): number {
-        const result = calories.find(el => {
+        const result = calories.find((el: any) => {
             return (el.time.getTime() === hrTime.getTime())
         })
         return result ? result.value : 0
