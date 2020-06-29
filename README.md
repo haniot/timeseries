@@ -14,9 +14,9 @@ Microservice responsible for time series on the HANIoT platform.
  See the [documentation](https://github.com/haniot/timeseries/wiki) for more information.
 
 ## Prerequisites
-- [Node 8.0.0+](https://nodejs.org/en/download/)
+- [Node 12.0.0+](https://nodejs.org/en/download/)
 - [InfluxDB 1.7+](https://www.influxdata.com/products/influxdb-overview/)
-- [RabbitMQ 3.7.0+](https://www.rabbitmq.com/download.html)
+- [RabbitMQ 3.8.0+](https://www.rabbitmq.com/download.html)
 
 ---
 
@@ -30,10 +30,19 @@ Application settings are defined by environment variables.. To define the settin
 | `PORT_HTTPS` | Port used to listen for HTTPS requests. Do not forget to provide the private key and the SSL/TLS certificate. See the topic [generate certificates](#generate-certificates). | `4001` |
 | `SSL_KEY_PATH` | SSL/TLS certificate private key. | `.certs/server.key` |
 | `SSL_CERT_PATH` | SSL/TLS certificate. | `.certs/server.crt` |
-| `RABBITMQ_URI` | URI containing the parameters for connection to the message channel RabbitMQ. The [URI specifications ](https://www.rabbitmq.com/uri-spec.html) defined by RabbitMQ are accepted. For example: `amqp://user:pass@host:port/vhost`. | `amqp://guest:guest`<br/>`@127.0.0.1:5672` |
-| `RABBITMQ_CA_PATH` | RabbitMQ CA file location. Must always be provided when using `amqps` protocol. | `.certs/ca.crt` |
-| `INFLUXDB_URI` | Database connection URI used if the application is running in development or production environment. For example: `http://user:pass@127.0.0.1:8086/timeseries`. | `http://127.0.0.1:8086/timeseries` |
-| `INFLUXDB_URI_TEST` | Database connection URI used if the application is running in test environment. For example: `http://user:pass@127.0.0.1:8086/timeseries`. | `http://127.0.0.1:8086/timeseries-test` |
+| `INFLUXDB_HOST` | InfluxDB database hostname. | `localhost` |
+| `INFLUXDB_PORT` | InfluxDB database port. | `8086` |
+| `INFLUXDB_PROTOCOL` | InfluxDB database protocol. (`http or https`). For TLS connection, the protocol is https and client certificates are required: (`INFLUXDB_CERT_PATH`, `INFLUXDB_KEY_PATH` e `INFLUXDB_CA_PATH`) | `http` |
+| `INFLUXDB_NAME` | InfluxDB database name. | `haniot-timeseries` |
+| `INFLUXDB_USER` | InfluxDB username for authentication. If the host does not require authentication, the value of this variable will be ignored. | `none` |
+| `INFLUXDB_PASS` | InfluxDB password for authentication. If the host does not require authentication, the value of this variable will be ignored. | `none` |
+| `INFLUXDB_CERT_PATH` | InfluxDB Certificate path. | `.certs/influxdb/cert.pem` |
+| `INFLUXDB_KEY_PATH` | InfluxDB Certificate Key path. | `.certs/influxdb/key.pem` |
+| `INFLUXDB_CA_PATH` | InfluxDB Certificate of the Authentication entity (CA). | `.certs/influxdb/ca.pem` |
+| `RABBITMQ_URI` | URI for connection to RabbitMQ. The [URI specifications ](https://www.rabbitmq.com/uri-spec.html). For example: `amqp://user:pass@host:port/vhost`. When TLS is used for conection the protocol is amqps and client certificates are required (`RABBITMQ_CERT_PATH`, `RABBITMQ_KEY_PATH`, `RABBITMQ_CA_PATH`) | `amqp://guest:guest`<br/>`@127.0.0.1:5672` |
+| `RABBITMQ_CERT_PATH` | RabbitMQ Certificate | `.certs/rabbitmq/cert.pem` |
+| `RABBITMQ_KEY_PATH` | RabbitMQ Key | `.certs/rabbitmq/key.pem` |
+| `RABBITMQ_CA_PATH` | RabbitMQ Certificate of the Authentication entity (CA). | `.certs/rabbitmq/ca.pem` |
 
 ## Generate Certificates
 For development and testing environments the easiest and fastest way is to generate your own self-signed certificates. These certificates can be used to encrypt data as well as certificates signed by a CA, but users will receive a warning that the certificate is not trusted for their computer or browser. Therefore, self-signed certificates should only be used in non-production environments, that is, development and testing environments. To do this, run the `create-self-signed-certs.sh` script in the root of the repository.
@@ -109,22 +118,25 @@ This command will download the latest image and create a container with the defa
 
 You can also create the container by passing the settings that are desired by the environment variables. The supported settings are the same as those defined in ["Set the environment variables"](#set-the-environment-variables). See the following example:
 ```sh
-docker run --rm \
-  -e PORT_HTTP=8080 \
-  -e PORT_HTTPS=8081 \
+  docker run -d --rm \
+  -e PORT_HTTP=8000 \
+  -e PORT_HTTPS=8001 \
+  -v $(pwd)/.certs:/etc \  
   -e SSL_KEY_PATH=.certs/server.key \
   -e SSL_CERT_PATH=.certs/server.crt \
-  -e RABBITMQ_URI="amqp://guest:guest@192.168.0.1:5672" \
-  -e INFLUXDB_URI="http://127.0.0.1:8086/timeseries" \
+  -e INFLUXDB_HOST=HOSTNAME \
+  -e INFLUXDB_PORT=8086 \
+  -e INFLUXDB_PROTOCOL=http \  
+  -e INFLUXDB_NAME=haniot-timeseries \
+  -e RABBITMQ_URI="amqp://guest:guest@HOSTNAME:5672" \
+  --name haniot-timeseries \   
   haniot/timeseries-service
 ```
 If the InfluxDB or RabbitMQ instance is in the host local, add the `--net=host` statement when creating the container, this will cause the docker container to communicate with its local host.
 ```sh
 docker run --rm \
   --net=host \
-  -e RABBITMQ_URI="amqp://guest:guest@localhost:5672" \
-  -e INFLUXDB_URI="http://127.0.0.1:8086/timeseries" \
-  haniot/timeseries-service
+  ...
 ```
 To generate your own docker image, run the following command:
 ```sh
@@ -134,10 +146,10 @@ docker build -t image_name:tag .
 [//]: # (These are reference links used in the body of this note.)
 [license-image]: https://img.shields.io/badge/license-Apache%202-blue.svg
 [license-url]: https://github.com/haniot/timeseries/blob/master/LICENSE
-[node-image]: https://img.shields.io/badge/node-%3E%3D%208.0.0-brightgreen.svg
+[node-image]: https://img.shields.io/badge/node-%3E%3D%2012.0.0-brightgreen.svg
 [node-url]: https://nodejs.org
-[travis-image]: https://travis-ci.org/haniot/timeseries.svg?branch=master
-[travis-url]: https://travis-ci.org/haniot/timeseries
+[travis-image]: https://travis-ci.com/haniot/timeseries.svg?branch=master
+[travis-url]: https://travis-ci.com/haniot/timeseries
 [coverage-image]: https://coveralls.io/repos/github/haniot/timeseries/badge.svg
 [coverage-url]: https://coveralls.io/github/haniot/timeseries?branch=master
 [known-vulnerabilities-image]: https://snyk.io/test/github/haniot/timeseries/badge.svg
