@@ -8,7 +8,7 @@ export abstract class Entity {
     private _id?: string
 
     protected constructor(id?: string) {
-        this._id = id
+        this.id = id
     }
 
     get id(): string | undefined {

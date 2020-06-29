@@ -15,15 +15,17 @@ export abstract class Default {
     public static readonly SWAGGER_URI: string = 'https://api.swaggerhub.com/apis/haniot/timeseries/v1/swagger.json'
     public static readonly LOGO_URI: string = 'https://i.imgur.com/O7PxGWQ.png'
 
+    // InfluxDB
+    public static readonly INFLUXDB_HOST: string = 'localhost'
+    public static readonly INFLUXDB_PORT: number = 8086
+    public static readonly INFLUXDB_NAME: string = 'haniot-timeseries'
+    public static readonly INFLUXDB_NAME_TEST: string = 'haniot-timeseries-test'
+    public static readonly INFLUXDB_PROTOCOL: string = 'http'
     public static readonly MEASUREMENT_HR_ZONES_NAME: string = 'heart_rate_zones'
     public static readonly MEASUREMENT_TIMESERIES_NAME: string = 'intraday_timeseries'
 
-    // MongoDB
-    public static readonly INFLUXDB_URI: string = 'http://127.0.0.1:8086/timeseries'
-    public static readonly INFLUXDB_URI_TEST: string = 'http://127.0.0.1:8086/timeseries-test'
-
     // RabbitMQ
-    public static readonly RABBITMQ_URI: string = 'amqp://guest:guest@127.0.0.1:5672'
+    public static readonly RABBITMQ_URI: string = 'amqp://guest:guest@localhost:5672'
 
     // Log
     public static readonly LOG_DIR: string = 'logs'
@@ -32,6 +34,4 @@ export abstract class Default {
     // To generate self-signed certificates, see: https://devcenter.heroku.com/articles/ssl-certificate-self
     public static readonly SSL_KEY_PATH: string = '.certs/server.key'
     public static readonly SSL_CERT_PATH: string = '.certs/server.crt'
-    public static readonly RABBITMQ_CA_PATH: string = '.certs/ca.crt'
-
 }

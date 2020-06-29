@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'
-import { IConnectionFactory, IDBOptions } from '../port/connection.factory.interface'
+import { IConnectionFactory, IDBConfig, IDBOptions } from '../port/connection.factory.interface'
 import { Identifier } from '../../di/identifiers'
 import { IDatabase } from '../port/database.interface'
 import { ILogger } from '../../utils/custom.logger'
@@ -13,7 +13,7 @@ import { InfluxDB } from 'influx'
  * @implements {IDatabase}
  */
 @injectable()
-export class MyInfluxDB implements IDatabase {
+export class ConnectionInfluxDB implements IDatabase {
     private _connection?: InfluxDB
 
     private readonly _eventConnection: EventEmitter
@@ -36,13 +36,13 @@ export class MyInfluxDB implements IDatabase {
     /**
      * Connect InfluxDB.
      *
-     * @param uri This specification defines an URI scheme.
+     * @param config This specification defines an URI scheme.
      * @param options {IDBOptions} Connection setup Options.
      * @return {Promise<void>}
      */
-    public async connect(uri: string, options?: IDBOptions): Promise<void> {
+    public async tryConnect(config: IDBConfig, options?: IDBOptions): Promise<void> {
         const _this = this
-        await this._connectionFactory.createConnection(uri, options)
+        await this._connectionFactory.createConnection(config, options)
             .then((connection: InfluxDB) => {
                 this._connection = connection
                 this._eventConnection.emit('connected')
@@ -51,9 +51,9 @@ export class MyInfluxDB implements IDatabase {
             .catch((err) => {
                 this._connection = undefined
                 this._eventConnection.emit('disconnected')
-                this._logger.warn(`Error trying to connect for the first time with InfluxDB: ${err.message}`)
+                this._logger.warn(`Error trying to connect for the first time with InfluxDB! ${err.message}`)
                 setTimeout(async () => {
-                    _this.connect(uri, options).then()
+                    _this.tryConnect(config, options).then()
                 }, 2000)
             })
     }
