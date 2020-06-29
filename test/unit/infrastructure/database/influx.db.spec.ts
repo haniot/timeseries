@@ -1,8 +1,9 @@
 import { assert } from 'chai'
 import { ConnectionFactoryInfluxDBMock } from '../../../mocks/connection.factory.influx.db.mock'
-import { MyInfluxDB } from '../../../../src/infrastructure/database/influxdb'
+import { ConnectionInfluxDB } from '../../../../src/infrastructure/database/connection.influxdb'
 import { CustomLoggerMock } from '../../../mocks/custom.logger.mock'
 import { EventEmitter } from 'events'
+import { IDBConfig } from '../../../../src/infrastructure/port/connection.factory.interface'
 
 describe('INFRASTRUCTURE: InfluxDB', () => {
     const connectionFactoryMock = new ConnectionFactoryInfluxDBMock()
@@ -10,17 +11,17 @@ describe('INFRASTRUCTURE: InfluxDB', () => {
 
     context('Connection.', () => {
         it('should return Connection instance.', async () => {
-            const influxDB = new MyInfluxDB(connectionFactoryMock, loggerMoc)
-            await influxDB.connect('http://127.0.0.1:8086/db.test')
+            const influxDB = new ConnectionInfluxDB(connectionFactoryMock, loggerMoc)
+            await influxDB.tryConnect({ host: 'localhost' } as IDBConfig)
             assert.notEqual(influxDB.connection, undefined)
         })
 
         it('should return undefined connection instance for invalid URI or server unavailable.', (done) => {
             const connFactory = new ConnectionFactoryInfluxDBMock()
             connFactory.simulateFailure = true
-            const influxDB = new MyInfluxDB(connFactory, loggerMoc)
+            const influxDB = new ConnectionInfluxDB(connFactory, loggerMoc)
             influxDB
-                .connect('127.0.0.1:5000')
+                .tryConnect({ host: 'localhost' } as IDBConfig)
                 .then(() => {
                     assert.equal(influxDB.connection, undefined)
                     done()
@@ -29,8 +30,8 @@ describe('INFRASTRUCTURE: InfluxDB', () => {
         })
 
         it('return an undefined connection instance after calling the dispose() function.', async () => {
-            const influxDB = new MyInfluxDB(connectionFactoryMock, loggerMoc)
-            await influxDB.connect('http://127.0.0.1:8086/db.test')
+            const influxDB = new ConnectionInfluxDB(connectionFactoryMock, loggerMoc)
+            await influxDB.tryConnect({ host: 'localhost' } as IDBConfig)
             assert.notEqual(influxDB.connection, undefined) // connection ok
 
             await influxDB.dispose() // connection destroy
@@ -40,14 +41,14 @@ describe('INFRASTRUCTURE: InfluxDB', () => {
 
     context('EventEmitter.', () => {
         it('should return instance EventEmitter when calling function eventConnection.', () => {
-            const influxDB = new MyInfluxDB(connectionFactoryMock, loggerMoc)
+            const influxDB = new ConnectionInfluxDB(connectionFactoryMock, loggerMoc)
             assert.instanceOf(influxDB.eventConnection, EventEmitter)
         })
 
         it('should call the callback triggered by the "connected" event.', (done) => {
-            const influxDB = new MyInfluxDB(connectionFactoryMock, loggerMoc)
+            const influxDB = new ConnectionInfluxDB(connectionFactoryMock, loggerMoc)
             influxDB.eventConnection.on('connected', done)
-            influxDB.connect('http://127.0.0.1:8086/db.test').catch(done)
+            influxDB.tryConnect({ host: 'localhost' } as IDBConfig).catch(done)
         })
     })
 })

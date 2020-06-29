@@ -13,6 +13,7 @@ import { TimeSeriesGroup } from '../../../src/application/domain/model/time.seri
 import { IntradayTimeSeries } from '../../../src/application/domain/model/intraday.time.series'
 import { IntradayTimeSeriesMock } from '../../mocks/intraday.time.series.mock'
 import { IIntradayTimeSeriesRepository } from '../../../src/application/port/intraday.time.series.repository.interface'
+import { Config } from '../../../src/utils/config'
 
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
@@ -43,7 +44,8 @@ describe('CONTROLLER: timeseries', () => {
             tmActiveMinutes.patientId = '4a62be07d6f33400146c9b63'
 
             before(async () => {
-                await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                const dbConfigs = Config.getInfluxConfig()
+                await db.tryConnect(dbConfigs, dbConfigs.options)
 
                 await addTimeSeries(tmSteps)
                 await addTimeSeries(tmCalories)
@@ -171,7 +173,8 @@ describe('CONTROLLER: timeseries', () => {
 
             context('when you have validation problem', () => {
                 before(async () => {
-                    await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                    const dbConfigs = Config.getInfluxConfig()
+                    await db.tryConnect(dbConfigs, dbConfigs.options)
                 })
 
                 after(async () => {
@@ -257,7 +260,8 @@ describe('CONTROLLER: timeseries', () => {
             tmCalories.patientId = tmHeartRate.patientId
 
             before(async () => {
-                await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                const dbConfigs = Config.getInfluxConfig()
+                await db.tryConnect(dbConfigs, dbConfigs.options)
 
                 await addTimeSeries(tmSteps)
                 await addTimeSeries(tmCalories)
@@ -327,7 +331,9 @@ describe('CONTROLLER: timeseries', () => {
             })
 
             it('should return status code 200 for time series of type heart_rate (data intraday).', async () => {
-                await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                const dbConfigs = Config.getInfluxConfig()
+                await db.tryConnect(dbConfigs, dbConfigs.options)
+
                 const startTime = '2017-06-01T00:00:00.000Z'
                 const endTime = '2017-06-01T23:59:59.000Z'
                 const intradayHeartRate: IntradayTimeSeries = new IntradayTimeSeriesMock()
@@ -424,7 +430,8 @@ describe('CONTROLLER: timeseries', () => {
 
             context('when you have validation problem', () => {
                 before(async () => {
-                    await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                    const dbConfigs = Config.getInfluxConfig()
+                    await db.tryConnect(dbConfigs, dbConfigs.options)
                 })
 
                 after(async () => {

@@ -9,7 +9,7 @@ export interface IEventBus extends IDisposable {
     connectionRpcServer: IConnectionEventBus
     connectionRpcClient: IConnectionEventBus
 
-    enableLogger(): void
+    enableLogger(level?: string): void
 
     publish(event: IntegrationEvent<any>, routingKey: string): Promise<boolean>
 

@@ -12,7 +12,7 @@ import { ConnectionRabbitMQ } from '../infrastructure/eventbus/rabbitmq/connecti
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
 import { EventBusRabbitMQ } from '../infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
 import { ConnectionFactoryInfluxDB } from '../infrastructure/database/connection.factory.infludb'
-import { MyInfluxDB } from '../infrastructure/database/influxdb'
+import { ConnectionInfluxDB } from '../infrastructure/database/connection.influxdb'
 import { IDatabase } from '../infrastructure/port/database.interface'
 import { ITimeSeriesService } from '../application/port/timeseries.service.interface'
 import { TimeSeriesService } from '../application/service/time.series.service'
@@ -93,7 +93,7 @@ class IoC {
             .to(ConnectionFactoryInfluxDB).inSingletonScope()
         this._container
             .bind<IDatabase>(Identifier.INFLUXDB_CONNECTION)
-            .to(MyInfluxDB).inSingletonScope()
+            .to(ConnectionInfluxDB).inSingletonScope()
         this._container
             .bind<IConnectionFactory>(Identifier.RABBITMQ_CONNECTION_FACTORY)
             .to(ConnectionFactoryRabbitMQ).inSingletonScope()

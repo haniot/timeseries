@@ -90,7 +90,6 @@ export class App {
      * @return Promise<void>
      */
     private setupSwaggerUI(): void {
-        // Middleware swagger. It should not run in the test environment.
         const options = {
             swaggerUrl: Default.SWAGGER_URI,
             customCss: '.swagger-ui .topbar { display: none }',
