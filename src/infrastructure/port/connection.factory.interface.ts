@@ -1,8 +1,18 @@
 export interface IConnectionFactory {
-    createConnection(uri: string, options?: IDBOptions | IEventBusOptions): Promise<any>
+    createConnection(uri: string | IDBConfig, options?: IDBOptions | IEventBusOptions): Promise<any>
+}
+
+export interface IDBConfig {
+    host: string
+    port: number
+    database: string
+    username: string
+    password: string
+    protocol: string
 }
 
 export interface IDBOptions {
+    ssl?: ISSL
 }
 
 export interface IEventBusOptions {

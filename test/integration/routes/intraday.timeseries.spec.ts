@@ -9,6 +9,7 @@ import { IntradayTimeSeries } from '../../../src/application/domain/model/intrad
 import { IIntradayTimeSeriesRepository } from '../../../src/application/port/intraday.time.series.repository.interface'
 import { IntradayTimeSeriesMock } from '../../mocks/intraday.time.series.mock'
 import { Strings } from '../../../src/utils/strings'
+import { Config } from '../../../src/utils/config'
 
 const app: App = DIContainer.get(Identifier.APP)
 const request = require('supertest')(app.getExpress())
@@ -49,7 +50,8 @@ describe('CONTROLLER: intraday.timeseries', () => {
             const zonesExpected: any = countZones(hrDataSetMinutes, intradayCalories.dataSet)
 
             before(async () => {
-                await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                const dbConfigs = Config.getInfluxConfig()
+                await db.tryConnect(dbConfigs, dbConfigs.options)
 
                 await addIntradayTimeSeries(intradaySteps)
                 await addIntradayTimeSeries(intradayCalories)
@@ -139,7 +141,10 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 // active_minutes
                 expect(result[3].statusCode).to.equal(200)
                 expect(result[3].body.summary).to.deep.equal(
-                    { ...intradayActiveMinutes.toJSON().summary, ...{ interval: '15m' }, end_time: '2019-07-01T23:45:00' }
+                    {
+                        ...intradayActiveMinutes.toJSON().summary, ...{ interval: '15m' },
+                        end_time: '2019-07-01T23:45:00'
+                    }
                 )
                 expect(result[3].body.data_set).to.deep.equal(
                     buildDatasetInterval(intradayActiveMinutes.toJSON().data_set, '15m')
@@ -257,7 +262,8 @@ describe('CONTROLLER: intraday.timeseries', () => {
 
             context('when you have validation problem', () => {
                 before(async () => {
-                    await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                    const dbConfigs = Config.getInfluxConfig()
+                    await db.tryConnect(dbConfigs, dbConfigs.options)
                 })
 
                 after(async () => {
@@ -370,7 +376,8 @@ describe('CONTROLLER: intraday.timeseries', () => {
             const zonesExpected = countZones(hrDataSetMinutes, intradayCalories.toJSON().data_set)
 
             before(async () => {
-                await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                const dbConfigs = Config.getInfluxConfig()
+                await db.tryConnect(dbConfigs, dbConfigs.options)
 
                 await addIntradayTimeSeries(intradaySteps)
                 await addIntradayTimeSeries(intradayCalories)
@@ -578,7 +585,8 @@ describe('CONTROLLER: intraday.timeseries', () => {
 
             context('when you have validation problem', () => {
                 before(async () => {
-                    await db.connect(process.env.MONGODB_URI_TEST || Default.INFLUXDB_URI_TEST)
+                    const dbConfigs = Config.getInfluxConfig()
+                    await db.tryConnect(dbConfigs, dbConfigs.options)
                 })
 
                 after(async () => {
