@@ -26,8 +26,7 @@ export class BackgroundService {
             await this._influxdb.tryConnect(dbConfigs, dbConfigs.options)
 
             // Open RabbitMQ connection and perform tasks
-            this._eventBus.enableLogger()
-            this.startTasks()
+            this._startTasks()
         } catch (err) {
             return Promise.reject(new Error(`Error initializing services in background! ${err.message}`))
         }
@@ -44,7 +43,7 @@ export class BackgroundService {
     /**
      * Open RabbitMQ connection and perform tasks
      */
-    private startTasks(): void {
+    private _startTasks(): void {
         const rabbitConfigs = Config.getRabbitConfig()
         this._eventBus
             .connectionSub

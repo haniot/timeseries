@@ -148,8 +148,8 @@ docker build -t image_name:tag .
 [license-url]: https://github.com/haniot/timeseries/blob/master/LICENSE
 [node-image]: https://img.shields.io/badge/node-%3E%3D%2012.0.0-brightgreen.svg
 [node-url]: https://nodejs.org
-[travis-image]: https://travis-ci.org/haniot/timeseries.svg?branch=master
-[travis-url]: https://travis-ci.org/haniot/timeseries
+[travis-image]: https://travis-ci.com/haniot/timeseries.svg?branch=master
+[travis-url]: https://travis-ci.com/haniot/timeseries
 [coverage-image]: https://coveralls.io/repos/github/haniot/timeseries/badge.svg
 [coverage-url]: https://coveralls.io/github/haniot/timeseries?branch=master
 [known-vulnerabilities-image]: https://snyk.io/test/github/haniot/timeseries/badge.svg
