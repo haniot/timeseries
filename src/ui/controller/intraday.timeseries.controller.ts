@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { inject } from 'inversify'
 import { Request, Response } from 'express'
 import { controller, httpGet, request, response } from 'inversify-express-utils'
@@ -7,7 +6,6 @@ import { ILogger } from '../../utils/custom.logger'
 import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { IIntradayTimeSeriesService } from '../../application/port/intraday.time.series.service.interface'
 import { IntradayTimeSeries } from '../../application/domain/model/intraday.time.series'
-import { TimeSeriesType } from '../../application/domain/utils/time.series.type'
 
 @controller('/v1/patients/:patient_id/:resource')
 export class IntradayTimeSeriesController {
@@ -31,8 +29,8 @@ export class IntradayTimeSeriesController {
                 .listByInterval(
                     req.params.patient_id,
                     req.params.resource,
-                    this.buildDate(req.params.date),
-                    this.buildInterval(req.params.interval, req.params.resource)
+                    req.params.date,
+                    req.params.interval
                 )
             return res.status(200).send(result)
         } catch (err) {
@@ -55,11 +53,11 @@ export class IntradayTimeSeriesController {
                 .listByIntervalAndTime(
                     req.params.patient_id,
                     req.params.resource,
-                    this.buildDate(req.params.start_date),
-                    this.buildDate(req.params.end_date),
+                    req.params.start_date,
+                    req.params.end_date,
                     req.params.start_time,
                     req.params.end_time,
-                    this.buildInterval(req.params.interval, req.params.resource)
+                    req.params.interval
                 )
             return res.status(200).send(result)
         } catch (err) {
@@ -67,15 +65,5 @@ export class IntradayTimeSeriesController {
             return res.status(handlerError.code)
                 .send(handlerError.toJSON())
         }
-    }
-
-    private buildInterval(interval: string, type: string): string {
-        if (type === TimeSeriesType.HEART_RATE) return interval
-        if (interval === '1s' || interval === '15s') interval = interval.replace('s', 'm')
-        return interval
-    }
-
-    private buildDate(date: string): string {
-        return date === 'today' ? moment().format('YYYY-MM-DD') : date
     }
 }

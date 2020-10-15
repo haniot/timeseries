@@ -9,17 +9,17 @@ export abstract class Identifier {
     // Controllers
     public static readonly HOME_CONTROLLER: any = Symbol.for('HomeController')
     public static readonly TIMESERIES_CONTROLLER: any = Symbol.for('TimeSeriesController')
-    public static readonly INTRADAY_CONTROLLER: any = Symbol.for('IntradayController')
+    public static readonly INTRADAY_CONTROLLER: any = Symbol.for('IntradayTimeSeriesController')
 
     // Services
     public static readonly TIMESERIES_SERVICE: any = Symbol.for('TimeSeriesService')
     public static readonly INTRADAY_SERVICE: any = Symbol.for('IntradayTimeSeriesService')
 
     // Repositories
-    public static readonly INFLUXDB_CONNECTION_FACTORY: any = Symbol.for('InfluxDBConnectionFactory')
+    public static readonly INFLUXDB_CONNECTION_FACTORY: any = Symbol.for('ConnectionFactoryInfluxDB')
     public static readonly INFLUXDB_CONNECTION: any = Symbol.for('ConnectionInfluxDB')
     public static readonly TIMESERIES_REPOSITORY: any = Symbol.for('TimeSeriesRepository')
-    public static readonly INTRADAY_REPOSITORY: any = Symbol.for('IntradayRepository')
+    public static readonly INTRADAY_REPOSITORY: any = Symbol.for('IntradayTimeSeriesRepository')
 
     // Mappers
     public static readonly TIME_SERIES_ENTITY_MAPPER: any = Symbol.for('TimeSeriesEntityMapper')

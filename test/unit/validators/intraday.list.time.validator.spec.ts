@@ -127,7 +127,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
 
         context('interval.', () => {
             it('should throw ValidationException when range is not allowed.', () => {
-                const interval = '60m'
+                const interval = '721m'
                 try {
                     IntradayListTimeValidator.validate('5a62be07de34500146d9c544',
                         'steps', '2018-11-17', '2018-11-17',
@@ -136,7 +136,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                 } catch (e) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval))
-                    assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_SUPPORTED)
+                    assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_LENGTH)
                 }
             })
         })

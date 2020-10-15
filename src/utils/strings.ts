@@ -25,7 +25,9 @@ export abstract class Strings {
         RESOURCE_NOT_SUPPORTED: 'Resource {0} not supported!',
         RESOURCE_SUPPORTED: 'Only the following resources types are supported: {0}.',
         INTERVAL_NOT_SUPPORTED: 'Interval {0} not supported!',
-        INTERVAL_SUPPORTED: 'Only the following intervals types are supported: 1sec, 15sec, 1min or 15min.',
+        INTERVAL_SUPPORTED: 'The interval must contain at least one integer greater than 0, ' +
+            'and must be in seconds (s), minutes (m) or hours (h).',
+        INTERVAL_LENGTH: 'The interval should be a maximum of 12 hours.',
         CONNECTION_NOT_EXIST: 'Instance of database connection does not exist!',
         VALIDATE: {
             REQUIRED_FIELDS: 'Required fields were not provided...',

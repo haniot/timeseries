@@ -3,11 +3,22 @@ import { Strings } from '../../../utils/strings'
 
 export class IntervalValidator {
     public static validate(interval: string): void | ValidationException {
-        // checks if the intervals are between 1sec, 15sec, 1min or 15min
-        if (!(/^(0[1]|1[5]?)(s|m)$/i).test(interval)) {
+        // Checks whether the interval has at least one digit >= 0 and whether it is in seconds or minutes.
+        if (!(/^([1-9][0-9]*)([sm])$/).test(interval)) {
             throw new ValidationException(
                 Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval),
                 Strings.ERROR_MESSAGE.INTERVAL_SUPPORTED
+            )
+        }
+
+        // Converting the interval number to hours.
+        let intervalNumber
+        if (interval.indexOf('s') !== -1) intervalNumber = Number(interval.substring(0, interval.indexOf('s'))) / 3600 // Seconds.
+        else intervalNumber = Number(interval.substring(0, interval.indexOf('m'))) / 60 // Minutes.
+        if (intervalNumber > 12) {
+            throw new ValidationException(
+                Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval),
+                Strings.ERROR_MESSAGE.INTERVAL_LENGTH
             )
         }
     }
