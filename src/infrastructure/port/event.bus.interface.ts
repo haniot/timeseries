@@ -21,5 +21,5 @@ export interface IEventBus extends IDisposable {
 
     provideResource(name: string, listener: (...any) => any): Promise<boolean>
 
-    executeResource(serviceName: string, resourceName: string, query?: string | any): Promise<any>
+    executeResource(serviceName: string, resourceName: string, ...params: any[]): Promise<any>
 }

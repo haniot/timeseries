@@ -71,7 +71,7 @@ export class IntradayTimeSeriesMock {
         if (moment(startTime).utc().isSame(moment().utc(), 'day')) {
             endTime = moment().format(`YYYY-MM-DDTHH:mm:ss.SSS[Z]`)
         }
-        if(interval === '1s') endTime = moment(endTime).add(1, 'second').format()
+        if (interval === '1s') endTime = moment(endTime).add(1, 'second').format()
         for (const current = moment(startTime); current.isBefore(endTime); current.add(intervalValue, intervalUnit)) {
             const random = Math.floor((Math.random() * 201)) + 30 // 30-200
 

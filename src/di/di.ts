@@ -32,6 +32,7 @@ import { IntradayTimeSeriesEntityMapper } from '../infrastructure/entity/mapper/
 import { IntradayTimeSeries } from '../application/domain/model/intraday.time.series'
 import { IntradayTimeSeriesEntity } from '../infrastructure/entity/intraday.time.series.entity'
 import { SubscribeEventBusTask } from '../background/task/subscribe.event.bus.task'
+import { RpcServerEventBusTask } from '../background/task/rpc.server.event.bus.task'
 
 class IoC {
     private readonly _container: Container
@@ -111,6 +112,9 @@ class IoC {
         this._container
             .bind(Identifier.SUBSCRIBE_EVENT_BUS_TASK)
             .to(SubscribeEventBusTask).inSingletonScope()
+        this._container
+            .bind(Identifier.RPC_SERVER_EVENT_BUS_TASK)
+            .to(RpcServerEventBusTask).inSingletonScope()
 
         // Log
         this._container.bind<ILogger>(Identifier.LOGGER).to(CustomLogger).inSingletonScope()

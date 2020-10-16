@@ -121,7 +121,7 @@ export class EventBusRabbitMQ implements IEventBus {
         })
     }
 
-    public executeResource(serviceName: string, resourceName: string, queryString?: string): Promise<any> {
+    public executeResource(serviceName: string, resourceName: string, ...params: any[]): Promise<any> {
         if (!this.connectionRpcClient.isOpen) {
             return Promise.reject(new EventBusException('No connection open!'))
         }
@@ -130,13 +130,13 @@ export class EventBusRabbitMQ implements IEventBus {
             .rpcClient(
                 serviceName,
                 resourceName,
-                [queryString],
+                params,
                 {
                     exchange: {
                         type: 'direct',
                         durable: true
                     },
-                    rcpTimeout: 5000
+                    rpcTimeout: 5000
                 })
     }
 
