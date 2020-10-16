@@ -692,16 +692,16 @@ describe('CONTROLLER: intraday.timeseries', () => {
                     )
                 })
 
-                it('should return status code 400 when TODOOO parameter is not in valid format.', async () => {
+                it('should return status code 400 when interval parameter is not in valid format.', async () => {
                     const requests = [
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/steps/date/2020-11-01/2020-11-01' +
                             '/time/10:00/10:50/interval/1sec/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/calories/date/2020-11-01/2020-11-01' +
                             '/time/00:00:00/23:59:59/interval/30.1s/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/distance/date/2020-11-01/2020-11-01' +
-                            '/time/07:05/07:40:15/interval/60M/timeseries'),
+                            '/time/07:05/07:40:15/interval/0m/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/active_minutes/date/2020-11-01/2020-11-01' +
-                            '/time/00:00/23:59:59/interval/0h/timeseries'),
+                            '/time/00:00/23:59:59/interval/10H/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/heart_rate/date/2020-11-01/2020-11-01' +
                             '/time/00:00:00/23:59:59/interval/7d/timeseries')
                     ]
@@ -717,8 +717,8 @@ describe('CONTROLLER: intraday.timeseries', () => {
 
                     assert(result[0], '1sec') // steps
                     assert(result[1], '30.1s') // calories
-                    assert(result[2], '60M') // distance
-                    assert(result[3], '0h') // active_minutes
+                    assert(result[2], '0m') // distance
+                    assert(result[3], '10H') // active_minutes
                     assert(result[4], '7d') // heart_rate
                 })
             })

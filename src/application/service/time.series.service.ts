@@ -23,9 +23,15 @@ export class TimeSeriesService implements ITimeSeriesService {
 
     public async listAll(patientId: string, startDate: string, endDate: string): Promise<TimeSeriesGroup> {
         try {
+            // Constructs dates in the appropriate format.
+            startDate = this.buildDate(startDate)
+            endDate = this.buildDate(endDate)
+
+            // Validates params.
             TimeSeriesListValidator.validate(patientId, startDate, endDate)
             const timeSeriesGroup: TimeSeriesGroup = new TimeSeriesGroup()
 
+            // Calls the repository.
             timeSeriesGroup.steps = await this._timeSeriesRepository
                 .listByType(patientId, startDate, endDate, TimeSeriesType.STEPS)
             timeSeriesGroup.calories = await this._timeSeriesRepository
@@ -43,7 +49,14 @@ export class TimeSeriesService implements ITimeSeriesService {
 
     public listByType(patientId: string, startDate: string, endDate: string, type: string): Promise<TimeSeries> {
         try {
+            // Constructs dates in the appropriate format.
+            startDate = this.buildDate(startDate)
+            endDate = this.buildDate(endDate)
+
+            // Validates params.
             TimeSeriesListValidator.validate(patientId, startDate, endDate, type)
+
+            // Calls the repository.
             return this._timeSeriesRepository.listByType(patientId, startDate, endDate, type)
         } catch (e) {
             return Promise.reject(e)
@@ -56,5 +69,27 @@ export class TimeSeriesService implements ITimeSeriesService {
 
     public remove(id: string): Promise<boolean> {
         throw new Error('Unsupported feature!')
+    }
+
+    /**
+     * Builds the date in YYYY-MM-DD format if it is 'today'.
+     *
+     * @param date Date used to construct the final date.
+     * @return {string}
+     */
+    private buildDate(date: string): string {
+        return date === 'today' ? this.generateDate() : date
+    }
+
+    private generateDate(): string {
+        const date = new Date()
+        const year = String(date.getFullYear())
+        let month = String(date.getMonth() + 1)
+        let day = String(date.getDate())
+
+        if (month.length === 1) month = month.padStart(2, '0')
+        if (day.length === 1) day = day.padStart(2, '0')
+
+        return [year, month, day].join('-')
     }
 }
