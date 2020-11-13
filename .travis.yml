@@ -1,8 +1,9 @@
 sudo: required
 language: node_js
 node_js:
-  - "12"
   - "13"
+  - "14"
+  - "15"
 env:
   - NODE_ENV=test RABBITMQ_URI=amqp://guest:guest@localhost:5672/haniot
 addons:
@@ -22,6 +23,7 @@ before_script:
   - sudo rabbitmqctl set_permissions -p haniot guest ".*" ".*" ".*"
   - npm install && npm install coveralls mocha-lcov-reporter --save-dev
 script:
+  - npm run build
   - npm test
 after_success:
   - nyc report --reporter=text-lcov | coveralls
