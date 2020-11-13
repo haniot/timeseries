@@ -189,7 +189,13 @@ export class TimeSeriesRepository implements ITimeSeriesRepository {
                     AND type = '${TimeSeriesType.HEART_RATE}'
                     AND time >= '${startTime}'
                     AND time <= '${endTime}'
-                    GROUP BY time(1m) fill(none) ORDER BY time ASC;`
+                    GROUP BY time(1m) fill(none) ORDER BY time ASC;
+                SELECT ROUND(MEAN(value)) as average FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
+                    WHERE user_id = '${patientId}'
+                    AND type = '${TimeSeriesType.HEART_RATE}'
+                    AND time >= '${startTime}'
+                    AND time <= '${endTime}'
+                    GROUP BY time(1d) fill(0);`
             )
         }
         return result

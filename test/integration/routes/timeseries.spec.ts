@@ -319,17 +319,6 @@ describe('CONTROLLER: timeseries', () => {
                     })
             })
 
-            it('should return status code 200 for time series of type heart_rate.', () => {
-                return request
-                    .get(`/v1/patients/${tmHeartRate.patientId}/heart_rate/date/${startDate}/${endDate}/timeseries`)
-                    .set('Accept', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body.data_set.length).to.equal(tmHeartRate.dataSet.length)
-                        expect(res.body).to.deep.equal(tmHeartRate.toJSON())
-                    })
-            })
-
             it('should return status code 200 for time series of type heart_rate (data intraday).', async () => {
                 const dbConfigs = Config.getInfluxConfig()
                 await db.tryConnect(dbConfigs, dbConfigs.options)

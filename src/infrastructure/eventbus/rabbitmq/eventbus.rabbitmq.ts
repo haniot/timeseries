@@ -136,7 +136,7 @@ export class EventBusRabbitMQ implements IEventBus {
                         type: 'direct',
                         durable: true
                     },
-                    rpcTimeout: 5000
+                    rpcTimeout: 15000
                 })
     }
 

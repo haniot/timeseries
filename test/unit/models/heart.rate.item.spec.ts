@@ -15,9 +15,10 @@ describe('MODELS: HeartRateItem', () => {
     it('should return HeartRateItem object with the correct values ​​according to values ​​set in the builder.', () => {
         const expectedObj = {
             date: new Date().toISOString().split('T')[0],
+            value: 130,
             zones: hrZones
         }
-        const item: HeartRateItem = new HeartRateItem(expectedObj.date, expectedObj.zones)
+        const item: HeartRateItem = new HeartRateItem(expectedObj.date, expectedObj.zones, 130)
 
         assert.equal(item.date, expectedObj.date)
         assert.deepEqual(item.zones, expectedObj.zones)
@@ -27,8 +28,10 @@ describe('MODELS: HeartRateItem', () => {
         const item: HeartRateItem = new HeartRateItem()
         item.date = '2019-12-01'
         item.zones = hrZones
+        item.value = 125
 
         assert.equal(item.date, '2019-12-01')
+        assert.equal(item.value, 125)
         assert.deepEqual(item.zones.outOfRange, hrZones.outOfRange)
         assert.deepEqual(item.zones.fatBurn, hrZones.fatBurn)
         assert.deepEqual(item.zones.cardio, hrZones.cardio)
@@ -39,22 +42,26 @@ describe('MODELS: HeartRateItem', () => {
         const item: HeartRateItem = new HeartRateItem()
 
         assert.equal(item.date, '')
+        assert.equal(item.value, undefined)
         assert.deepEqual(item.zones, new HeartRateZone())
     })
 
     it('should return json object with expected attributes when calling toJSON() function.', () => {
         const expectedObj = {
             date: '2019-10-25',
+            value: 150,
             zones: hrZones.toJSON()
         }
-        assert.deepEqual(new HeartRateItem('2019-10-25', hrZones).toJSON(), expectedObj)
+        assert.deepEqual(new HeartRateItem('2019-10-25', hrZones, 150).toJSON(), expectedObj)
     })
 
     it('should return HeartRateItem object according to parameter passed in function fromJSON(json).', () => {
         const date: string = new Date().toISOString().split('T')[0]
-        const expectedObj: HeartRateItem = new HeartRateItem(date, hrZones)
+        const expectedObj: HeartRateItem = new HeartRateItem(date, hrZones, 150)
         const json: any = {
-            date, zones: {
+            date,
+            value: 150,
+            zones: {
                 out_of_range: hrZones.outOfRange,
                 fat_burn: hrZones.fatBurn,
                 cardio: hrZones.cardio,

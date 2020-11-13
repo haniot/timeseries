@@ -138,22 +138,26 @@ export class TimeSeriesEntityMapper implements IEntityMapper<TimeSeries, TimeSer
         if (!(obj.data_set instanceof Array)) return timeSeries
 
         const endDate = moment(obj.end_date).add(1, 'day').format('YYYY-MM-DD')
-        let index = 0
+        let indexCal = 0
+        let indexHr = 0
 
         for (const m = moment(obj.start_date); m.isBefore(endDate); m.add(1, 'day')) {
-            const heartRateData: Array<any> = (obj.data_set[0] instanceof Array) ? obj.data_set[index] : obj.data_set
-            const caloriesData: Array<any> = (obj.calories[0] instanceof Array) ? obj.calories[index] : obj.calories
+            const heartRateData: Array<any> = (obj.data_set[0] instanceof Array) ? obj.data_set[indexHr] : obj.data_set
+            const caloriesData: Array<any> = (obj.calories[0] instanceof Array) ? obj.calories[indexCal] : obj.calories
             const currentDate = m.utc().format('YYYY-MM-DD')
 
             const heartRateZone: HeartRateZone = this.buildHeartRateZone(obj.zones, heartRateData, caloriesData, currentDate)
-            timeSeries.dataSet.push(new HeartRateItem(currentDate, heartRateZone))
+            timeSeries.dataSet.push(
+                new HeartRateItem(currentDate, heartRateZone, obj.data_set[indexHr + 1][0]?.average)
+            )
 
             timeSeries.summary.outOfRangeTotal += heartRateZone.outOfRange.duration
             timeSeries.summary.fatBurnTotal += heartRateZone.fatBurn.duration
             timeSeries.summary.cardioTotal += heartRateZone.cardio.duration
             timeSeries.summary.peakTotal += heartRateZone.peak.duration
 
-            index++
+            indexCal++
+            indexHr += 2
         }
 
         return timeSeries

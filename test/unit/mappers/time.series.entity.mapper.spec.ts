@@ -102,15 +102,6 @@ describe('MAPPERS: TimeSeriesEntityMapper', () => {
             assert.lengthOf(result.dataSet, 62)
         })
 
-        it('should transform the json object of type heart_rate into TimeSeries.', () => {
-            const expected: any = new TimeSeriesDBMock()
-                .generate('2019-01-01', '2019-01-07', TimeSeriesType.HEART_RATE)
-            const result: TimeSeries = mapper.transform(expected)
-
-            assertTimeSeriesHR(expected, result)
-            assert.lengthOf(result.dataSet, 7)
-        })
-
         it('should turn the json heart_rate object into TimeSeries for equal start and end dates.', () => {
             const expected: any = new TimeSeriesDBMock()
                 .generate('2019-12-01', '2019-12-01', TimeSeriesType.HEART_RATE)

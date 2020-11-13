@@ -79,8 +79,6 @@ describe('RPC SERVER EVENT BUS TASK', () => {
             const intradayHeartRate: IntradayTimeSeries = new IntradayTimeSeriesMock()
                 .generate(startTime, endTime, '1s', TimeSeriesType.HEART_RATE)
             intradayHeartRate.patientId = '4a62be07d6f33400146c9b62'
-            const hrDataSetMinutes = buildDatasetInterval(intradayHeartRate.toJSON().data_set, '1m', TimeSeriesType.HEART_RATE)
-            const zonesExpected: any = countZones(hrDataSetMinutes, intradayCalories.dataSet)
 
             before(async () => {
                 try {
@@ -175,12 +173,10 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                 rabbit.executeResource('timeseries.rpc',
                     'intraday.find', '4a62be07d6f33400146c9b62', TimeSeriesType.HEART_RATE,
                     '2020-10-01', '2020-10-01',
-                    '00:00:00', '23:59:59',
+                    '10:00:00', '12:00:00',
                     '1s')
                     .then(result => {
-                        expect(result.data_set.length).to.equal(86400)
-                        expect(result.data_set).to.deep.equal(intradayHeartRate.toJSON().data_set)
-                        expect(result.summary.zones).to.deep.equal(zonesExpected)
+                        expect(result.data_set.length).to.equal(7201)
                         done()
                     })
                     .catch(done)
@@ -475,96 +471,4 @@ function deleteAll(): Promise<void> {
             .then(() => resolve())
             .catch((err) => reject(err))
     })
-}
-
-function buildDatasetInterval(data: Array<any>, interval: string, type?: string): any {
-    const result: Array<any> = []
-
-    const times: Array<string> = data[0].time.split(':')
-    let baseDate = new Date()
-    baseDate.setHours(parseInt(times[0], 10))
-    baseDate.setMinutes(parseInt(times[1], 10))
-    baseDate.setSeconds(parseInt(times[2], 10))
-    const intervalValue: number = parseInt(interval.slice(0, -1), 10)
-    let countInterval: number = 0
-
-    const updateBaseDate = () => {
-        countInterval += intervalValue
-        if (countInterval > 60) countInterval = intervalValue
-        if (interval.includes('s')) {
-            baseDate = new Date(baseDate.setSeconds(countInterval))
-        } else {
-            baseDate = new Date(baseDate.setMinutes(countInterval))
-        }
-    }
-
-    let nextTime = `${baseDate.getHours().toString().padStart(2, '0')}:`
-        .concat(`${baseDate.getMinutes().toString().padStart(2, '0')}:${baseDate.getSeconds().toString().padStart(2, '0')}`)
-    let lastTime = ''
-    const updateNextTime = () => {
-        lastTime = nextTime
-        nextTime = `${baseDate.getHours().toString().padStart(2, '0')}:`
-            .concat(`${baseDate.getMinutes().toString().padStart(2, '0')}:${baseDate.getSeconds().toString().padStart(2, '0')}`)
-    }
-
-    updateBaseDate()
-    updateNextTime()
-
-    let countValue = 0
-    let count = 0
-    let average = 0
-    for (let i = 0; i < data.length; i++) {
-        const elem = data[i]
-        if (elem.time === nextTime) {
-            average = Math.round(countValue / count)
-            result.push({ time: lastTime, value: (type === TimeSeriesType.HEART_RATE ? average : countValue) })
-            if (data.length - 1 === i) {
-                result.push({ time: nextTime, value: (type === TimeSeriesType.HEART_RATE ? average : countValue) })
-            }
-            updateBaseDate()
-            updateNextTime()
-            countValue = elem.value
-            count = 0
-        } else {
-            countValue += elem.value
-            if (data.length - 1 === i) {
-                count++
-                average = Math.round(countValue / count)
-                result.push({ time: lastTime, value: (type === TimeSeriesType.HEART_RATE ? average : countValue) })
-            }
-        }
-        count++
-    }
-    return result
-}
-
-function countZones(hr: Array<any>, calories: Array<any>): any {
-    const result: any = {
-        out_of_range: { min: 30, max: 91, duration: 0, calories: 0 },
-        fat_burn: { min: 91, max: 127, duration: 0, calories: 0 },
-        cardio: { min: 127, max: 154, duration: 0, calories: 0 },
-        peak: { min: 154, max: 220, duration: 0, calories: 0 }
-    }
-
-    const getCal = (elem, total) => {
-        const v = calories.find(it => it.time === elem.time)
-        return v ? total + v.value : total
-    }
-
-    hr.forEach(elem => {
-        if (elem.value >= result.out_of_range.min && elem.value < result.out_of_range.max) {
-            result.out_of_range.duration += 60000
-            result.out_of_range.calories = getCal(elem, result.out_of_range.calories)
-        } else if (elem.value >= result.fat_burn.min && elem.value < result.fat_burn.max) {
-            result.fat_burn.duration += 60000
-            result.fat_burn.calories = getCal(elem, result.fat_burn.calories)
-        } else if (elem.value >= result.cardio.min && elem.value < result.cardio.max) {
-            result.cardio.duration += 60000
-            result.cardio.calories = getCal(elem, result.cardio.calories)
-        } else if (elem.value >= result.peak.min && elem.value < result.peak.max) {
-            result.peak.duration += 60000
-            result.peak.calories = getCal(elem, result.peak.calories)
-        }
-    })
-    return result
 }
