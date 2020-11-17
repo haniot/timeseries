@@ -63,7 +63,7 @@ describe('MODELS: TimeSeries', () => {
             .generate('2019-12-01', '2019-12-31', 'steps')
         const json: any = expectedObj.toJSON()
         json.type = 'steps'
-        json.patient_id = expectedObj.patientId
+        json.user_id = expectedObj.patientId
 
         const result = new TimeSeries().fromJSON(json)
 
@@ -78,7 +78,7 @@ describe('MODELS: TimeSeries', () => {
             .generate('2019-12-01', '2019-12-31', 'heart_rate')
         const json: any = expectedObj.toJSON()
         json.type = 'heart_rate'
-        json.patient_id = expectedObj.patientId
+        json.user_id = expectedObj.patientId
 
         const result = new TimeSeries().fromJSON(json)
         assert.deepEqual(result.dataSet, expectedObj.dataSet)
@@ -91,7 +91,7 @@ describe('MODELS: TimeSeries', () => {
         'passed in function fromJSON(json).', () => {
         const json: any = {
             data_set: {},
-            user_id: {},
+            userId: {},
             summary: new Summary(150).toJSON() // not be created using function fromJSON(json)
         }
         assert.deepEqual(new TimeSeries().fromJSON(json), new TimeSeries())
@@ -104,7 +104,7 @@ describe('MODELS: TimeSeries', () => {
             .generate('2019-12-01', '2019-12-25', 'active_minutes')
         const json: any = expectedObj.toJSON()
         json.type = expectedObj.type
-        json.patient_id = expectedObj.patientId
+        json.user_id = expectedObj.patientId
         json.summary = '{ total: 150}' // not be created using function fromJSON(json)
 
         const result: TimeSeries = new TimeSeries().fromJSON(JSON.stringify(json))
@@ -119,7 +119,7 @@ describe('MODELS: TimeSeries', () => {
             .generate('2019-12-29', '2019-12-31', 'distance')
         const json: any = expectedObj.toJSON()
         json.type = expectedObj.type
-        json.patient_id = expectedObj.patientId
+        json.user_id = expectedObj.patientId
         json.data_set = undefined
 
         const result: TimeSeries = new TimeSeries().fromJSON(json)

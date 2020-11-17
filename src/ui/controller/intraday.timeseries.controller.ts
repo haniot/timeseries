@@ -7,7 +7,7 @@ import { ApiExceptionManager } from '../exception/api.exception.manager'
 import { IIntradayTimeSeriesService } from '../../application/port/intraday.time.series.service.interface'
 import { IntradayTimeSeries } from '../../application/domain/model/intraday.time.series'
 
-@controller('/v1/patients/:patient_id/:resource')
+@controller('/v1/patients/:user_id/:resource')
 export class IntradayTimeSeriesController {
     constructor(
         @inject(Identifier.INTRADAY_SERVICE) private readonly _intradayService: IIntradayTimeSeriesService,
@@ -16,7 +16,7 @@ export class IntradayTimeSeriesController {
     }
 
     /**
-     * Retrieves the intraday time series of a resource associated with a patient.
+     * Retrieves the intraday time series of a resource associated with an user.
      * Note: It goes from 00:00:00 to 23:59:59. Or, until the current time if the date is the current day.
      *
      * @param {Request} req
@@ -27,7 +27,7 @@ export class IntradayTimeSeriesController {
         try {
             const result: IntradayTimeSeries = await this._intradayService
                 .listByInterval(
-                    req.params.patient_id,
+                    req.params.user_id,
                     req.params.resource,
                     req.params.date,
                     req.params.interval
@@ -41,7 +41,7 @@ export class IntradayTimeSeriesController {
     }
 
     /**
-     * Retrieves the intraday time series of a resource associated with a patient.
+     * Retrieves the intraday time series of a resource associated with an user.
      *
      * @param {Request} req
      * @param {Response} res
@@ -51,7 +51,7 @@ export class IntradayTimeSeriesController {
         try {
             const result: IntradayTimeSeries = await this._intradayService
                 .listByIntervalAndTime(
-                    req.params.patient_id,
+                    req.params.user_id,
                     req.params.resource,
                     req.params.start_date,
                     req.params.end_date,

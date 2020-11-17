@@ -68,7 +68,7 @@ export class IntradayTimeSeries implements IJSONSerializable, IJSONDeserializabl
             json = JSON.parse(json)
         }
 
-        if (json.patient_id) this.patientId = json.patient_id
+        if (json.user_id) this.patientId = json.user_id
         if (json.type) this.type = json.type
 
         // build data set

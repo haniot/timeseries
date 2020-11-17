@@ -8,7 +8,7 @@ import { ITimeSeriesService } from '../../application/port/timeseries.service.in
 import { TimeSeries } from '../../application/domain/model/time.series'
 import { TimeSeriesGroup } from '../../application/domain/model/time.series.group'
 
-@controller('/v1/patients/:patient_id')
+@controller('/v1/patients/:user_id')
 export class TimeSeriesController {
     constructor(
         @inject(Identifier.TIMESERIES_SERVICE) private readonly _timeseriesService: ITimeSeriesService,
@@ -17,7 +17,7 @@ export class TimeSeriesController {
     }
 
     /**
-     * Retrieve the time series of all supported features associated with a patient except heart rate.
+     * Retrieve the time series of all supported features associated with an user except heart rate.
      * Available resources: steps, calories, distance, active_minutes.
      *
      * @param {Request} req
@@ -27,7 +27,7 @@ export class TimeSeriesController {
     public async getAllTimeSeries(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: TimeSeriesGroup = await this._timeseriesService
-                .listAll(req.params.patient_id, req.params.start_date, req.params.end_date)
+                .listAll(req.params.user_id, req.params.start_date, req.params.end_date)
             return res.status(200).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)
@@ -37,7 +37,7 @@ export class TimeSeriesController {
     }
 
     /**
-     * Retrieves the time series of a resource associated with a patient.
+     * Retrieves the time series of a resource associated with an user.
      *
      * @param req
      * @param res
@@ -46,7 +46,7 @@ export class TimeSeriesController {
     public async getTimeSeriesByType(@request() req: Request, @response() res: Response): Promise<Response> {
         try {
             const result: TimeSeries = await this._timeseriesService
-                .listByType(req.params.patient_id, req.params.start_date, req.params.end_date, req.params.resource)
+                .listByType(req.params.user_id, req.params.start_date, req.params.end_date, req.params.resource)
             return res.status(200).send(result)
         } catch (err) {
             const handlerError = ApiExceptionManager.build(err)

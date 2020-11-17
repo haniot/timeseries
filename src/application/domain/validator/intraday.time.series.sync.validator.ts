@@ -15,7 +15,7 @@ export class IntradayTimeSeriesSyncValidator {
     public static validate(intraday: IntradayTimeSeries): void | ValidationException {
         const fields: Array<string> = []
 
-        if (!intraday.patientId) fields.push('patient_id')
+        if (!intraday.patientId) fields.push('user_id')
         else ObjectIdValidator.validate(intraday.patientId)
 
         if (!intraday.type) fields.push('type')

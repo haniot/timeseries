@@ -26,7 +26,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
         await deleteAll()
     })
 
-    describe('/v1/patients/{patient_id}/{resource}/date/{date}/interval/{interval}/timeseries', () => {
+    describe('/v1/patients/{user_id}/{resource}/date/{date}/interval/{interval}/timeseries', () => {
         context('when the request is successful.', () => {
             const startTime = '2019-07-01T00:00:00'
             const endTime = '2019-07-01T23:59:59'
@@ -270,7 +270,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                     await db.dispose()
                 })
 
-                it('should return status code 400 when patient_id is not in valid format.', async () => {
+                it('should return status code 400 when user_id is not in valid format.', async () => {
                     const requests = [
                         request.get('/v1/patients/4a62be07d6f33400146c9b6/steps/date/2019-07-01/interval/1m/timeseries'),
                         request.get('/v1/patients/132/calories/date/2019-07-01/interval/1m/timeseries'),
@@ -350,7 +350,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
         })
     })
 
-    describe('/v1/patients/{patient_id}/{resource}/date/{start_date}/{end_date}' +
+    describe('/v1/patients/{user_id}/{resource}/date/{start_date}/{end_date}' +
         '/time/{start_time}/{end_time}/interval/{interval}/timeseries', () => {
         context('when the request is successful.', () => {
             const startTime = '2020-11-01T00:00:00'
@@ -593,7 +593,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                     await db.dispose()
                 })
 
-                it('should return status code 400 when patient_id is not in valid format.', async () => {
+                it('should return status code 400 when user_id is not in valid format.', async () => {
                     const requests = [
                         request.get('/v1/patients/4a62be07d6f33400146c9b6/steps/date/2020-11-01/2020-11-01' +
                             '/time/10:00/10:50/interval/1m/timeseries'),
