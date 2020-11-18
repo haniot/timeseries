@@ -26,7 +26,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
         await deleteAll()
     })
 
-    describe('/v1/patients/{patient_id}/{resource}/date/{date}/interval/{interval}/timeseries', () => {
+    describe('/v1/patients/{user_id}/{resource}/date/{date}/interval/{interval}/timeseries', () => {
         context('when the request is successful.', () => {
             const startTime = '2019-07-01T00:00:00'
             const endTime = '2019-07-01T23:59:59'
@@ -270,7 +270,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                     await db.dispose()
                 })
 
-                it('should return status code 400 when patient_id is not in valid format.', async () => {
+                it('should return status code 400 when user_id is not in valid format.', async () => {
                     const requests = [
                         request.get('/v1/patients/4a62be07d6f33400146c9b6/steps/date/2019-07-01/interval/1m/timeseries'),
                         request.get('/v1/patients/132/calories/date/2019-07-01/interval/1m/timeseries'),
@@ -323,11 +323,11 @@ describe('CONTROLLER: intraday.timeseries', () => {
 
                 it('should return status code 400 when interval parameter is not in valid format.', async () => {
                     const requests = [
-                        request.get('/v1/patients/4a62be07d6f33400146c9b62/steps/date/2019-07-01/interval/10m/timeseries'),
-                        request.get('/v1/patients/4a62be07d6f33400146c9b62/calories/date/2019-07-01/interval/5s/timeseries'),
-                        request.get('/v1/patients/4a62be07d6f33400146c9b62/distance/date/2019-07-01/interval/30m/timeseries'),
+                        request.get('/v1/patients/4a62be07d6f33400146c9b62/steps/date/2019-07-01/interval/10.1m/timeseries'),
+                        request.get('/v1/patients/4a62be07d6f33400146c9b62/calories/date/2019-07-01/interval/5ss/timeseries'),
+                        request.get('/v1/patients/4a62be07d6f33400146c9b62/distance/date/2019-07-01/interval/30M/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b62/active_minutes/date/2019-07-01/' +
-                            'interval/1h/timeseries'),
+                            'interval/0h/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b62/heart_rate/date/2019-07-01/interval/1d/timeseries')
                     ]
                     const result = await Promise.all(requests)
@@ -340,17 +340,17 @@ describe('CONTROLLER: intraday.timeseries', () => {
                         expect(res.body.description).to.equal(Strings.ERROR_MESSAGE.INTERVAL_SUPPORTED)
                     }
 
-                    assert(result[0], '10m') // steps
-                    assert(result[1], '5s') // calories
-                    assert(result[2], '30m') // distance
-                    assert(result[3], '1h') // active_minutes
+                    assert(result[0], '10.1m') // steps
+                    assert(result[1], '5ss') // calories
+                    assert(result[2], '30M') // distance
+                    assert(result[3], '0h') // active_minutes
                     assert(result[4], '1d') // heart_rate
                 })
             })
         })
     })
 
-    describe('/v1/patients/{patient_id}/{resource}/date/{start_date}/{end_date}' +
+    describe('/v1/patients/{user_id}/{resource}/date/{start_date}/{end_date}' +
         '/time/{start_time}/{end_time}/interval/{interval}/timeseries', () => {
         context('when the request is successful.', () => {
             const startTime = '2020-11-01T00:00:00'
@@ -593,7 +593,7 @@ describe('CONTROLLER: intraday.timeseries', () => {
                     await db.dispose()
                 })
 
-                it('should return status code 400 when patient_id is not in valid format.', async () => {
+                it('should return status code 400 when user_id is not in valid format.', async () => {
                     const requests = [
                         request.get('/v1/patients/4a62be07d6f33400146c9b6/steps/date/2020-11-01/2020-11-01' +
                             '/time/10:00/10:50/interval/1m/timeseries'),
@@ -692,16 +692,16 @@ describe('CONTROLLER: intraday.timeseries', () => {
                     )
                 })
 
-                it('should return status code 400 when TODOOO parameter is not in valid format.', async () => {
+                it('should return status code 400 when interval parameter is not in valid format.', async () => {
                     const requests = [
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/steps/date/2020-11-01/2020-11-01' +
                             '/time/10:00/10:50/interval/1sec/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/calories/date/2020-11-01/2020-11-01' +
-                            '/time/00:00:00/23:59:59/interval/30s/timeseries'),
+                            '/time/00:00:00/23:59:59/interval/30.1s/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/distance/date/2020-11-01/2020-11-01' +
-                            '/time/07:05/07:40:15/interval/60m/timeseries'),
+                            '/time/07:05/07:40:15/interval/0m/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/active_minutes/date/2020-11-01/2020-11-01' +
-                            '/time/00:00/23:59:59/interval/1h/timeseries'),
+                            '/time/00:00/23:59:59/interval/10H/timeseries'),
                         request.get('/v1/patients/4a62be07d6f33400146c9b63/heart_rate/date/2020-11-01/2020-11-01' +
                             '/time/00:00:00/23:59:59/interval/7d/timeseries')
                     ]
@@ -716,9 +716,9 @@ describe('CONTROLLER: intraday.timeseries', () => {
                     }
 
                     assert(result[0], '1sec') // steps
-                    assert(result[1], '30s') // calories
-                    assert(result[2], '60m') // distance
-                    assert(result[3], '1h') // active_minutes
+                    assert(result[1], '30.1s') // calories
+                    assert(result[2], '0m') // distance
+                    assert(result[3], '10H') // active_minutes
                     assert(result[4], '7d') // heart_rate
                 })
             })

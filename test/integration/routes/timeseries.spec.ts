@@ -30,7 +30,7 @@ describe('CONTROLLER: timeseries', () => {
         await deleteAll()
     })
 
-    describe('/v1/patients/{patient_id}/date/{start_date}/{end_date}/timeseries', () => {
+    describe('/v1/patients/{user_id}/date/{start_date}/{end_date}/timeseries', () => {
         context('when the request is successful.', () => {
             const startDate = '2019-10-01'
             const endDate = '2019-10-31'
@@ -181,7 +181,7 @@ describe('CONTROLLER: timeseries', () => {
                     await db.dispose()
                 })
 
-                it('should return status code 400 when patient_id is not in valid format.', () => {
+                it('should return status code 400 when user_id is not in valid format.', () => {
                     return request
                         .get(`/v1/patients/4a62be07d6f33400146c9b6315699a/date/2019-10-11/2019-10-11/timeseries`)
                         .set('Accept', 'application/json')
@@ -248,7 +248,7 @@ describe('CONTROLLER: timeseries', () => {
         })
     })
 
-    describe('/v1/patients/{patient_id}/{resource}/date/{start_date}/{end_date}/timeseries', () => {
+    describe('/v1/patients/{user_id}/{resource}/date/{start_date}/{end_date}/timeseries', () => {
         context('when the request is successful.', () => {
             const startDate = '2019-01-01'
             const endDate = '2019-12-31'
@@ -316,17 +316,6 @@ describe('CONTROLLER: timeseries', () => {
                     .then(res => {
                         expect(res.body.data_set.length).to.equal(tmActiveMinutes.dataSet.length)
                         expect(res.body).to.deep.equal(tmActiveMinutes.toJSON())
-                    })
-            })
-
-            it('should return status code 200 for time series of type heart_rate.', () => {
-                return request
-                    .get(`/v1/patients/${tmHeartRate.patientId}/heart_rate/date/${startDate}/${endDate}/timeseries`)
-                    .set('Accept', 'application/json')
-                    .expect(200)
-                    .then(res => {
-                        expect(res.body.data_set.length).to.equal(tmHeartRate.dataSet.length)
-                        expect(res.body).to.deep.equal(tmHeartRate.toJSON())
                     })
             })
 
@@ -438,7 +427,7 @@ describe('CONTROLLER: timeseries', () => {
                     await db.dispose()
                 })
 
-                it('should return status code 400 when patient_id is not in valid format.', () => {
+                it('should return status code 400 when user_id is not in valid format.', () => {
                     return request
                         .get(`/v1/patients/123/steps/date/2019-10-11/2019-10-11/timeseries`)
                         .set('Accept', 'application/json')

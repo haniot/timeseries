@@ -126,8 +126,8 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
         })
 
         context('interval.', () => {
-            it('should throw ValidationException when range is not allowed.', () => {
-                const interval = '60m'
+            it('should throw ValidationException with message and invalid interval description (0 is not allowed)', () => {
+                const interval = '0s'
                 try {
                     IntradayListTimeValidator.validate('5a62be07de34500146d9c544',
                         'steps', '2018-11-17', '2018-11-17',
@@ -137,6 +137,35 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_SUPPORTED)
+                }
+            })
+
+            it('should throw ValidationException with message and invalid interval description (The unit cannot be capitalized)',
+                () => {
+                    const interval = '10S'
+                    try {
+                        IntradayListTimeValidator.validate('5a62be07de34500146d9c544',
+                            'steps', '2018-11-17', '2018-11-17',
+                            '00:00:00', '02:00:00', interval)
+                        assert.fail()
+                    } catch (e) {
+                        assert.instanceOf(e, ValidationException)
+                        assert.equal(e.message, Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval))
+                        assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_SUPPORTED)
+                    }
+                })
+
+            it('should throw ValidationException when range is not allowed.', () => {
+                const interval = '721m'
+                try {
+                    IntradayListTimeValidator.validate('5a62be07de34500146d9c544',
+                        'steps', '2018-11-17', '2018-11-17',
+                        '00:00:00', '02:00:00', interval)
+                    assert.fail()
+                } catch (e) {
+                    assert.instanceOf(e, ValidationException)
+                    assert.equal(e.message, Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval))
+                    assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_LENGTH)
                 }
             })
         })

@@ -41,7 +41,9 @@ export class EventBusRabbitMQ implements IEventBus {
      */
     public async publish(event: IntegrationEvent<any>, routingKey: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
-            if (!this.connectionPub.isOpen) return resolve(false)
+            if (!this.connectionPub.isOpen) {
+                return reject(new EventBusException('No connection open!'))
+            }
 
             const message = { content: event.toJSON() }
             this.connectionPub
@@ -67,8 +69,12 @@ export class EventBusRabbitMQ implements IEventBus {
     public async subscribe(event: IntegrationEvent<any>, handler: IIntegrationEventHandler<IntegrationEvent<any>>,
                            routingKey: string): Promise<any> {
         return new Promise<boolean>(async (resolve, reject) => {
-            if (!this.connectionSub.isOpen) return resolve(false)
+            if (!this.connectionSub.isOpen) {
+                return reject(new EventBusException('No connection open!'))
+            }
+
             if (this._event_handlers.has(event.event_name)) return resolve(true)
+            this._event_handlers.set(event.event_name, handler)
 
             this.connectionSub
                 .subscribe(this.RABBITMQ_QUEUE_NAME, event.type, routingKey, (message) => {
@@ -93,7 +99,6 @@ export class EventBusRabbitMQ implements IEventBus {
                     receiveFromYourself: this._receiveFromYourself
                 })
                 .then(() => {
-                    this._event_handlers.set(event.event_name, handler)
                     resolve(true)
                 })
                 .catch(reject)
@@ -116,7 +121,7 @@ export class EventBusRabbitMQ implements IEventBus {
         })
     }
 
-    public executeResource(serviceName: string, resourceName: string, queryString?: string): Promise<any> {
+    public executeResource(serviceName: string, resourceName: string, ...params: any[]): Promise<any> {
         if (!this.connectionRpcClient.isOpen) {
             return Promise.reject(new EventBusException('No connection open!'))
         }
@@ -125,13 +130,13 @@ export class EventBusRabbitMQ implements IEventBus {
             .rpcClient(
                 serviceName,
                 resourceName,
-                [queryString],
+                params,
                 {
                     exchange: {
                         type: 'direct',
                         durable: true
                     },
-                    rcpTimeout: 5000
+                    rpcTimeout: 15000
                 })
     }
 

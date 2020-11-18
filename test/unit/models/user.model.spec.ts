@@ -16,6 +16,14 @@ describe('Models: User', () => {
             })
         })
 
+        context('when the json is empty', () => {
+            it('should return a user model with undefined parameters', () => {
+                const result = new User().fromJSON({})
+                assert.propertyVal(result, 'id', undefined)
+                assert.propertyVal(result, 'type', undefined)
+            })
+        })
+
         context('when the json is undefined', () => {
             it('should return a user model with undefined parameters', () => {
                 const result = new User().fromJSON(undefined)

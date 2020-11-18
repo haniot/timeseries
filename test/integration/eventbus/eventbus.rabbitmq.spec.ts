@@ -1,12 +1,17 @@
 import { expect } from 'chai'
-import { DIContainer } from '../../../src/di/di'
-import { Identifier } from '../../../src/di/identifiers'
 import { EventBusRabbitMQ } from '../../../src/infrastructure/eventbus/rabbitmq/eventbus.rabbitmq'
 import { IntegrationEvent } from '../../../src/application/integration-event/event/integration.event'
 import { IIntegrationEventHandler } from '../../../src/application/integration-event/handler/integration.event.handler.interface'
 import { Default } from '../../../src/utils/default'
+import { ConnectionRabbitMQ } from '../../../src/infrastructure/eventbus/rabbitmq/connection.rabbitmq'
+import { ConnectionFactoryRabbitMQ } from '../../../src/infrastructure/eventbus/rabbitmq/connection.factory.rabbitmq'
 
-const eventBus: EventBusRabbitMQ = DIContainer.get(Identifier.RABBITMQ_EVENT_BUS)
+const eventBus: EventBusRabbitMQ = new EventBusRabbitMQ(
+    new ConnectionRabbitMQ(new ConnectionFactoryRabbitMQ()),
+    new ConnectionRabbitMQ(new ConnectionFactoryRabbitMQ()),
+    new ConnectionRabbitMQ(new ConnectionFactoryRabbitMQ()),
+    new ConnectionRabbitMQ(new ConnectionFactoryRabbitMQ())
+)
 
 describe('EVENT BUS', () => {
     before(() => {
@@ -15,33 +20,30 @@ describe('EVENT BUS', () => {
 
     after(async () => {
         try {
-            await eventBus.connectionPub.dispose()
-            await eventBus.connectionSub.dispose()
-            await eventBus.connectionRpcServer.dispose()
-            await eventBus.connectionRpcClient.dispose()
+            await eventBus.dispose()
         } catch (err) {
             throw new Error('Failure on EventBus test: ' + err.message)
         }
     })
 
     describe('CONNECTION', () => {
-        it('should return false when trying to publish up without connection.', () => {
+        it('should reject an error when trying to publish up without connection.', () => {
             return eventBus
                 .publish({} as IntegrationEvent<any>, '')
-                .then((result: boolean) => {
-                    expect(result).to.eql(false)
+                .catch(err => {
+                    expect(err.message).to.eql('No connection open!')
                 })
         })
 
-        it('should return false when trying to subscribe up without connection.', () => {
+        it('should reject an error when trying to subscribe up without connection.', () => {
             return eventBus
                 .subscribe(
                     {} as IntegrationEvent<any>,
                     {} as IIntegrationEventHandler<any>,
                     ''
                 )
-                .then((result: boolean) => {
-                    expect(result).to.eql(false)
+                .catch(err => {
+                    expect(err.message).to.eql('No connection open!')
                 })
         })
 

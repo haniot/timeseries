@@ -64,7 +64,7 @@ describe('MODELS: IntradayTimeSeries', () => {
             .generate('2019-12-29T10:00:00', '2019-12-29T11:25:00', '1m', 'steps')
         const json: any = expectedObj.toJSON()
         json.type = 'steps'
-        json.patient_id = expectedObj.patientId
+        json.user_id = expectedObj.patientId
 
         const result = new IntradayTimeSeries().fromJSON(json)
 
@@ -78,7 +78,7 @@ describe('MODELS: IntradayTimeSeries', () => {
             .generate('2019-12-29T10:00:00', '2019-12-29T10:25:00', '1s', 'heart_rate')
         const json: any = intradayTimeSeries.toJSON()
         json.type = 'heart_rate'
-        json.patient_id = intradayTimeSeries.patientId
+        json.user_id = intradayTimeSeries.patientId
         json.start_time = intradayTimeSeries.summary.startTime
         json.end_time = intradayTimeSeries.summary.endTime
         json.zones = intradayTimeSeries.summary.zones.toJSON()
@@ -95,7 +95,7 @@ describe('MODELS: IntradayTimeSeries', () => {
         'passed in function fromJSON(json).', () => {
         const json: any = {
             data_set: {},
-            user_id: {},
+            userId: {},
             summary: new IntradaySummary('2019-12-29T10:00:00.000Z').toJSON()
         }
         assert.deepEqual(new IntradayTimeSeries().fromJSON(json), new IntradayTimeSeries())
@@ -108,7 +108,7 @@ describe('MODELS: IntradayTimeSeries', () => {
             .generate('2019-12-29T10:00:00', '2019-12-29T10:35:00', '1m', 'active_minutes')
         const json: any = expectedObj.toJSON()
         json.type = expectedObj.type
-        json.patient_id = expectedObj.patientId
+        json.user_id = expectedObj.patientId
 
         const result: IntradayTimeSeries = new IntradayTimeSeries().fromJSON(JSON.stringify(json))
         assert.deepEqual(result.dataSet, expectedObj.dataSet)
@@ -123,7 +123,7 @@ describe('MODELS: IntradayTimeSeries', () => {
             .generate('2019-12-29T09:10:15', '2019-12-29T09:55:00.000Z', '1m', 'distance')
         const json: any = expectedObj.toJSON()
         json.type = expectedObj.type
-        json.patient_id = expectedObj.patientId
+        json.user_id = expectedObj.patientId
         json.data_set = undefined
 
         const result: IntradayTimeSeries = new IntradayTimeSeries().fromJSON(json)
