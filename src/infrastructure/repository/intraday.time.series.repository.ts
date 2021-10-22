@@ -45,8 +45,8 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
                 await this._db.connection.writePoints(data.points)
                 // add heart rate zones
                 if (data.pointsHrZones) await this._db.connection.writePoints(data.pointsHrZones)
-                resolve()
-            } catch (err) {
+                resolve(item)
+            } catch (err: any) {
                 this._logger.error(err)
                 return reject(new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED))
             }
@@ -194,7 +194,7 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
                 )
             }
             return result
-        } catch (err) {
+        } catch (err: any) {
             this._logger.error(err)
             throw new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED)
         }

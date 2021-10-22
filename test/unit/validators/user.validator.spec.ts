@@ -9,7 +9,7 @@ describe('VALIDATORS: UserValidator', () => {
             try {
                 UserValidator.validate(new User('abc123'))
                 assert.fail('should throw ValidationException!')
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -18,7 +18,7 @@ describe('VALIDATORS: UserValidator', () => {
             try {
                 UserValidator.validate(new User())
                 assert.fail('should throw ValidationException!')
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -29,7 +29,7 @@ describe('VALIDATORS: UserValidator', () => {
             try {
                 UserValidator.validate(new User('5a62be07d6f33400146c9b61'))
                 UserValidator.validate(new User('5a62be07d6f33400146c9b61', 'patient'))
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })

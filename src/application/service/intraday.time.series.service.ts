@@ -68,7 +68,7 @@ export class IntradayTimeSeriesService implements IIntradayTimeSeriesService {
     }
 
     public add(item: IntradayTimeSeries): Promise<IntradayTimeSeries> {
-        return this._intradayRepository.create(item)
+        throw new Error('Unsupported feature!')
     }
 
     public remove(id: string): Promise<boolean> {

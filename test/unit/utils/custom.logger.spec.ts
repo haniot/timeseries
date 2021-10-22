@@ -172,7 +172,7 @@ describe('UTILS: CustomLogger', () => {
                 }
                 fs.rmdirSync(dirPath)
                 resolve()
-            } catch (e) {
+            } catch (e: any) {
                 reject(e)
             }
         })

@@ -22,7 +22,7 @@ export class UserDeleteEventHandler implements IIntegrationEventHandler<UserDele
 
             await this._intradayRepository.delete(user.id!)
             this._logger.info(`Action for event ${event.event_name} and user id ${user.id} executed successfully!`)
-        } catch (err) {
+        } catch (err: any) {
             this._logger.warn(`An error occurred while attempting `
                 .concat(`to perform the operation with the event: ${JSON.stringify(event)}. Error: ${err.message}`)
                 .concat(err.description ? ' ' + err.description : ''))

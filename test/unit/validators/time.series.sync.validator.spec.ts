@@ -42,7 +42,7 @@ describe('VALIDATORS: TimeSeriesSyncValidator', () => {
             timeSeries.forEach((elem: TimeSeries) => {
                 try {
                     TimeSeriesSyncValidator.validate(elem)
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     countExceptions += 1
                 }
@@ -63,7 +63,7 @@ describe('VALIDATORS: TimeSeriesSyncValidator', () => {
             timeSeries.forEach((elem: TimeSeries) => {
                 try {
                     TimeSeriesSyncValidator.validate(elem)
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     countExceptions += 1
                 }
@@ -102,7 +102,7 @@ describe('VALIDATORS: TimeSeriesSyncValidator', () => {
             timeSeries.forEach((elem: TimeSeries) => {
                 try {
                     TimeSeriesSyncValidator.validate(elem)
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     countExceptions += 1
                 }
@@ -120,7 +120,7 @@ describe('VALIDATORS: TimeSeriesSyncValidator', () => {
                 TimeSeriesSyncValidator.validate(generateDistance())
                 TimeSeriesSyncValidator.validate(generateActiveMinutes())
                 TimeSeriesSyncValidator.validate(generateHeartRate())
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })

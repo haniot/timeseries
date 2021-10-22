@@ -28,7 +28,7 @@ export class BackgroundService {
 
             // Open RabbitMQ connection and perform tasks
             this._startTasks()
-        } catch (err) {
+        } catch (err: any) {
             return Promise.reject(new Error(`Error initializing services in background! ${err.message}`))
         }
     }
@@ -38,7 +38,7 @@ export class BackgroundService {
             await this._influxdb.dispose()
 
             await this._eventBus.dispose()
-        } catch (err) {
+        } catch (err: any) {
             return Promise.reject(new Error(`Error stopping background services! ${err.message}`))
         }
     }

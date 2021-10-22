@@ -22,7 +22,7 @@ export class IntradayTimeSeriesSyncEventHandler implements IIntegrationEventHand
 
             await this._intradayRepository.create(intradayTimeSeries)
             this._logger.info(`Action for event ${event.event_name} and user id ${intradayTimeSeries.patientId} executed successfully!`)
-        } catch (err) {
+        } catch (err: any) {
             this._logger.warn(`An error occurred while attempting `
                 .concat(`to perform the operation with the event: ${JSON.stringify(event)}. Error: ${err.message}`)
                 .concat(err.description ? ' ' + err.description : ''))
