@@ -9,7 +9,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
             try {
                 ObjectIdValidator.validate('abc123')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -18,7 +18,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
             try {
                 ObjectIdValidator.validate('5a62be07zy34500146d9c544')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -27,7 +27,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
             try {
                 ObjectIdValidator.validate('')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -38,7 +38,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
             try {
                 ObjectIdValidator.validate(id)
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
                 assert.equal(e.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT.replace('{0}', id))
                 assert.equal(e.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -50,7 +50,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
         it('should not throw ValidationException with ObjectId in valid format 5a62be07de34500146d9c544.', () => {
             try {
                 ObjectIdValidator.validate('5a62be07de34500146d9c544')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })
@@ -58,7 +58,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
         it('should not throw ValidationException with ObjectId in valid format 5a62be07de34500146d9c544.', () => {
             try {
                 ObjectIdValidator.validate('5a62be07de34500146d9c544')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })
@@ -66,7 +66,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
         it('should not throw ValidationException with ObjectId in valid format 000000000000000000000000.', () => {
             try {
                 ObjectIdValidator.validate('000000000000000000000000')
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })
@@ -74,7 +74,7 @@ describe('VALIDATORS: ObjectIdValidator', () => {
         it('should not throw ValidationException with ObjectId in valid format 111111111111111111111111.', () => {
             try {
                 ObjectIdValidator.validate('111111111111111111111111')
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })

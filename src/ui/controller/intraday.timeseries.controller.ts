@@ -33,7 +33,7 @@ export class IntradayTimeSeriesController {
                     req.params.interval
                 )
             return res.status(200).send(result)
-        } catch (err) {
+        } catch (err: any) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
                 .send(handlerError.toJSON())
@@ -60,7 +60,7 @@ export class IntradayTimeSeriesController {
                     req.params.interval
                 )
             return res.status(200).send(result)
-        } catch (err) {
+        } catch (err: any) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
                 .send(handlerError.toJSON())

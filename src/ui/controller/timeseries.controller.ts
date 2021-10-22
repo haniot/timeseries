@@ -29,7 +29,7 @@ export class TimeSeriesController {
             const result: TimeSeriesGroup = await this._timeseriesService
                 .listAll(req.params.user_id, req.params.start_date, req.params.end_date)
             return res.status(200).send(result)
-        } catch (err) {
+        } catch (err: any) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
                 .send(handlerError.toJSON())
@@ -48,7 +48,7 @@ export class TimeSeriesController {
             const result: TimeSeries = await this._timeseriesService
                 .listByType(req.params.user_id, req.params.start_date, req.params.end_date, req.params.resource)
             return res.status(200).send(result)
-        } catch (err) {
+        } catch (err: any) {
             const handlerError = ApiExceptionManager.build(err)
             return res.status(handlerError.code)
                 .send(handlerError.toJSON())

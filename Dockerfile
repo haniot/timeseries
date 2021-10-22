@@ -6,7 +6,7 @@ RUN mkdir -p /usr/src/timeseries
 WORKDIR /usr/src/timeseries
 
 # Install app dependencies
-COPY package.json /usr/src/timeseries/
+COPY package.json package-lock.json /usr/src/timeseries/
 RUN npm install
 
 # Copy app source

@@ -13,7 +13,7 @@ describe('VALIDATORS: TimeSeriesListValidator', () => {
                     TimeSeriesListValidator.validate(id,
                         '2018-11-16', '2019-11-01', 'steps')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT.replace('{0}', id))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -28,7 +28,7 @@ describe('VALIDATORS: TimeSeriesListValidator', () => {
                     TimeSeriesListValidator.validate('5a62be07de34500146d9c544',
                         '2018-11-16', '2019-11-01', 'temperature')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.RESOURCE_NOT_SUPPORTED
                         .replace('{0}', 'temperature'))
@@ -45,7 +45,7 @@ describe('VALIDATORS: TimeSeriesListValidator', () => {
                     TimeSeriesListValidator.validate('5a62be07de34500146d9c544',
                         date, '2019-12-15', 'steps')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT.replace('{0}', date))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT_DESC)
@@ -57,7 +57,7 @@ describe('VALIDATORS: TimeSeriesListValidator', () => {
                     TimeSeriesListValidator.validate('5a62be07de34500146d9c544',
                         '2019-12-16', '2019-12-10', 'steps')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.RANGE_INVALID
                         .replace('{0}', '2019-12-16')
                         .replace('{1}', '2019-12-10'))
@@ -71,7 +71,7 @@ describe('VALIDATORS: TimeSeriesListValidator', () => {
                     TimeSeriesListValidator.validate('5a62be07de34500146d9c544',
                         '2018-11-16', '2019-12-16', 'steps')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.RANGE_INVALID
                         .replace('{0}', '2018-11-16')
@@ -87,7 +87,7 @@ describe('VALIDATORS: TimeSeriesListValidator', () => {
             try {
                 TimeSeriesListValidator.validate('5a62be07de34500146d9c544',
                     '2019-12-15', '2019-12-25', 'steps')
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })

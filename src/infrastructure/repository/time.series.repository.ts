@@ -38,7 +38,7 @@ export class TimeSeriesRepository implements ITimeSeriesRepository {
             // Preparing the measure to be entered all at once
             this._db.connection
                 .writePoints(this._mapper.transform(item).points)
-                .then((result) => resolve())
+                .then((result) => resolve(item))
                 .catch((err) => {
                     this._logger.error(err)
                     return reject(new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED))
@@ -109,7 +109,7 @@ export class TimeSeriesRepository implements ITimeSeriesRepository {
                 result.zones = await this.getZones(patientId, startDate, endDate)
 
                 return resolve(this._mapper.transform(result))
-            } catch (err) {
+            } catch (err: any) {
                 this._logger.error(err)
                 return reject(new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED))
             }
@@ -136,7 +136,7 @@ export class TimeSeriesRepository implements ITimeSeriesRepository {
                     WHERE user_id = '${patientId}' ORDER BY time DESC LIMIT 4;`
             )
             return result
-        } catch (err) {
+        } catch (err: any) {
             this._logger.error(err)
             throw new RepositoryException(Strings.ERROR_MESSAGE.UNEXPECTED)
         }

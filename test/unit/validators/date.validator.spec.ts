@@ -9,7 +9,7 @@ describe('VALIDATORS: DateValidator', () => {
             try {
                 DateValidator.validate('12-12-2019')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -18,7 +18,7 @@ describe('VALIDATORS: DateValidator', () => {
             try {
                 DateValidator.validate('2019-12-011')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -27,7 +27,7 @@ describe('VALIDATORS: DateValidator', () => {
             try {
                 DateValidator.validate('2019-12-32')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -37,7 +37,7 @@ describe('VALIDATORS: DateValidator', () => {
             try {
                 DateValidator.validate(date)
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
                 assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT.replace('{0}', date))
                 assert.equal(e.description, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT_DESC)
@@ -50,7 +50,7 @@ describe('VALIDATORS: DateValidator', () => {
             try {
                 DateValidator.validate(date)
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
                 assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT.replace('{0}', date))
             }
@@ -61,7 +61,7 @@ describe('VALIDATORS: DateValidator', () => {
             try {
                 DateValidator.validate(date)
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
                 assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.YEAR_NOT_ALLOWED.replace('{0}', date))
             }
@@ -72,7 +72,7 @@ describe('VALIDATORS: DateValidator', () => {
             try {
                 DateValidator.validate(date)
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
                 assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.YEAR_NOT_ALLOWED.replace('{0}', date))
             }
@@ -83,7 +83,7 @@ describe('VALIDATORS: DateValidator', () => {
         it('should not throw ValidationException with date in valid format 2019-12-14', () => {
             try {
                 DateValidator.validate('2019-12-14')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })
@@ -91,7 +91,7 @@ describe('VALIDATORS: DateValidator', () => {
         it('should not throw ValidationException for date 2020-02-29 in leap year.', () => {
             try {
                 DateValidator.validate('2020-02-29')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })
