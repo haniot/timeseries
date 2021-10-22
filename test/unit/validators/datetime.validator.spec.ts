@@ -9,7 +9,7 @@ describe('VALIDATORS: DatetimeValidator', () => {
             try {
                 DatetimeValidator.validate('12-12-2019 12:52:59')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -18,7 +18,7 @@ describe('VALIDATORS: DatetimeValidator', () => {
             try {
                 DatetimeValidator.validate('2019-12-011T12:52:59Z')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -27,7 +27,7 @@ describe('VALIDATORS: DatetimeValidator', () => {
             try {
                 DatetimeValidator.validate('2019-12-32T12:52:59Z')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -37,7 +37,7 @@ describe('VALIDATORS: DatetimeValidator', () => {
             try {
                 DatetimeValidator.validate(date)
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
                 assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.INVALID_DATETIME_FORMAT.replace('{0}', date))
                 assert.equal(e.description, Strings.ERROR_MESSAGE.DATE.INVALID_DATETIME_FORMAT_DESC)
@@ -49,7 +49,7 @@ describe('VALIDATORS: DatetimeValidator', () => {
         it('should not throw ValidationException with date in valid format 2019-12-14T12:52:59Z', () => {
             try {
                 DatetimeValidator.validate('2019-12-14T12:52:59Z')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })
@@ -57,7 +57,7 @@ describe('VALIDATORS: DatetimeValidator', () => {
         it('should not throw ValidationException with date in valid format 2019-12-26T17:58:43.155Z', () => {
             try {
                 DatetimeValidator.validate('2019-12-26T17:58:43.155Z')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })
@@ -65,7 +65,7 @@ describe('VALIDATORS: DatetimeValidator', () => {
         it('should not throw ValidationException with date in valid format 2019-12-14T12:52:59', () => {
             try {
                 DatetimeValidator.validate('2019-12-14T12:52:59')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })

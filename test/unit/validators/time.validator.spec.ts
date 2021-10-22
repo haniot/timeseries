@@ -9,7 +9,7 @@ describe('VALIDATORS: TimeValidator', () => {
             try {
                 TimeValidator.validate('12-02-59')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -18,7 +18,7 @@ describe('VALIDATORS: TimeValidator', () => {
             try {
                 TimeValidator.validate('12/02/59')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -27,7 +27,7 @@ describe('VALIDATORS: TimeValidator', () => {
             try {
                 TimeValidator.validate('2-02-45')
                 assert.fail()
-            } catch (e) {
+            } catch (e: any) {
                 assert.instanceOf(e, ValidationException)
             }
         })
@@ -38,7 +38,7 @@ describe('VALIDATORS: TimeValidator', () => {
                 try {
                     TimeValidator.validate(time)
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.equal(e.message, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT.replace('{0}', time))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT_DESC)
                 }
@@ -51,7 +51,7 @@ describe('VALIDATORS: TimeValidator', () => {
                 try {
                     TimeValidator.validate(time)
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.equal(e.message, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT.replace('{0}', time))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT_DESC)
                 }
@@ -63,7 +63,7 @@ describe('VALIDATORS: TimeValidator', () => {
         it('should not throw ValidationException with time in valid format 10:45:00', () => {
             try {
                 TimeValidator.validate('10:45:00')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })
@@ -71,7 +71,7 @@ describe('VALIDATORS: TimeValidator', () => {
         it('should not throw ValidationException with time in valid format 10:45', () => {
             try {
                 TimeValidator.validate('10:45')
-            } catch (err) {
+            } catch (err: any) {
                 assert.fail(err)
             }
         })

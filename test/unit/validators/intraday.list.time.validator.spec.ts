@@ -14,7 +14,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         '2018-11-16', '2018-11-16',
                         '00:00:00', '02:00:00', '1s')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT.replace('{0}', id))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT_DESC)
@@ -30,7 +30,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'temperature', '2018-11-16', '2018-11-16',
                         '00:00:00', '02:00:00', '1s')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.RESOURCE_NOT_SUPPORTED
                         .replace('{0}', 'temperature'))
@@ -48,7 +48,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', date, '2018-11-17',
                         '00:00:00', '02:00:00', '1s')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT.replace('{0}', date))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT_DESC)
@@ -62,7 +62,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', '2019-11-30', date,
                         '00:00:00', '02:00:00', '1s')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT.replace('{0}', date))
                 }
@@ -74,7 +74,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', '2019-12-16', '2019-12-18',
                         '00:00:00', '00:00:00', '1sec')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.equal(e.message, Strings.ERROR_MESSAGE.TIME.RANGE_INVALID)
                     assert.equal(e.description, Strings.ERROR_MESSAGE.TIME.RANGE_INVALID_DESC)
                     assert.instanceOf(e, ValidationException)
@@ -90,7 +90,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', '2018-11-17', '2018-11-17',
                         time, '02:00:00', '1s')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT.replace('{0}', time))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT_DESC)
@@ -104,7 +104,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', '2018-11-17', '2018-11-17',
                         '02:00:00', time, '1s')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT.replace('{0}', time))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT_DESC)
@@ -117,7 +117,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', '2019-12-16', '2019-12-17',
                         '00:00:00', '23:59:59', '1s')
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.equal(e.message, Strings.ERROR_MESSAGE.TIME.RANGE_INVALID)
                     assert.equal(e.description, Strings.ERROR_MESSAGE.TIME.RANGE_INVALID_DESC)
                     assert.instanceOf(e, ValidationException)
@@ -133,7 +133,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', '2018-11-17', '2018-11-17',
                         '00:00:00', '02:00:00', interval)
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_SUPPORTED)
@@ -148,7 +148,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                             'steps', '2018-11-17', '2018-11-17',
                             '00:00:00', '02:00:00', interval)
                         assert.fail()
-                    } catch (e) {
+                    } catch (e: any) {
                         assert.instanceOf(e, ValidationException)
                         assert.equal(e.message, Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval))
                         assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_SUPPORTED)
@@ -162,7 +162,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         'steps', '2018-11-17', '2018-11-17',
                         '00:00:00', '02:00:00', interval)
                     assert.fail()
-                } catch (e) {
+                } catch (e: any) {
                     assert.instanceOf(e, ValidationException)
                     assert.equal(e.message, Strings.ERROR_MESSAGE.INTERVAL_NOT_SUPPORTED.replace('{0}', interval))
                     assert.equal(e.description, Strings.ERROR_MESSAGE.INTERVAL_LENGTH)
@@ -177,7 +177,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                 IntradayListTimeValidator.validate('5a62be07de34500146d9c544',
                     'steps', '2018-11-17', '2018-11-17',
                     '00:00:00', '02:00:00', '1m')
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })
@@ -187,7 +187,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                 IntradayListTimeValidator.validate('5a62be07de34500146d9c544',
                     'steps', '2018-11-17', '2018-11-17',
                     '00:00', '02:00:00', '1m')
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })
@@ -201,7 +201,7 @@ describe('VALIDATORS: IntradayListTimeValidator', () => {
                         resource, '2018-11-17', '2018-11-17',
                         '00:00', '02:00:00', '1s')
                 }
-            } catch (e) {
+            } catch (e: any) {
                 assert.fail(e)
             }
         })

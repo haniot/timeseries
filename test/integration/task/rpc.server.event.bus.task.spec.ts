@@ -37,7 +37,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
             rpcServerEventBusTask.run()
 
             await timeout(5000)
-        } catch (err) {
+        } catch (err: any) {
             throw new Error('Failure on RpcServerEventBusTask test: ' + err.message)
         }
     })
@@ -50,7 +50,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
             await db.dispose()
 
             await rpcServerEventBusTask.stop()
-        } catch (err) {
+        } catch (err: any) {
             throw new Error('Failure on RpcServerEventBusTask test: ' + err.message)
         }
     })
@@ -89,7 +89,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                     await addIntradayTimeSeries(intradayDistance)
                     await addIntradayTimeSeries(intradayActiveMinutes)
                     await addIntradayTimeSeries(intradayHeartRate)
-                } catch (err) {
+                } catch (err: any) {
                     throw new Error('Failure on Provider IntradayTimeSeries test: ' + err.message)
                 }
             })
@@ -98,7 +98,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
             after(async () => {
                 try {
                     await deleteAll()
-                } catch (err) {
+                } catch (err: any) {
                     throw new Error('Failure on Provider IntradayTimeSeries test: ' + err.message)
                 }
             })
@@ -213,7 +213,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                     await addIntradayTimeSeries(intradayDistance)
                     await addIntradayTimeSeries(intradayActiveMinutes)
                     await addIntradayTimeSeries(intradayHeartRate)
-                } catch (err) {
+                } catch (err: any) {
                     throw new Error('Failure on Provider IntradayTimeSeries test: ' + err.message)
                 }
             })
@@ -222,7 +222,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
             after(async () => {
                 try {
                     await deleteAll()
-                } catch (err) {
+                } catch (err: any) {
                     throw new Error('Failure on Provider IntradayTimeSeries test: ' + err.message)
                 }
             })
@@ -314,7 +314,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                     await deleteAll()
 
                     await addIntradayTimeSeries(intradaySteps)
-                } catch (err) {
+                } catch (err: any) {
                     throw new Error('Failure on Provider IntradayTimeSeries test: ' + err.message)
                 }
             })
@@ -323,7 +323,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
             after(async () => {
                 try {
                     await deleteAll()
-                } catch (err) {
+                } catch (err: any) {
                     throw new Error('Failure on Provider IntradayTimeSeries test: ' + err.message)
                 }
             })
@@ -340,7 +340,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                             expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.UUID_NOT_VALID_FORMAT
                                 .replace('{0}', '4a62be07d6f33400146c9b621')))
                             done()
-                        } catch (err) {
+                        } catch (err: any) {
                             done(err)
                         }
                     })
@@ -358,7 +358,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                             expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.RESOURCE_NOT_SUPPORTED
                                 .replace('{0}', 'invalidResource')))
                             done()
-                        } catch (err) {
+                        } catch (err: any) {
                             done(err)
                         }
                     })
@@ -376,7 +376,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                             expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.DATE.INVALID_FORMAT
                                 .replace('{0}', '01-10-2020')))
                             done()
-                        } catch (err) {
+                        } catch (err: any) {
                             done(err)
                         }
                     })
@@ -394,7 +394,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                             expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.DATE.YEAR_NOT_ALLOWED
                                 .replace('{0}', '2262-10-01')))
                             done()
-                        } catch (err) {
+                        } catch (err: any) {
                             done(err)
                         }
                     })
@@ -411,7 +411,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                         try {
                             expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.TIME.RANGE_INVALID))
                             done()
-                        } catch (err) {
+                        } catch (err: any) {
                             done(err)
                         }
                     })
@@ -429,7 +429,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                             expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT
                                 .replace('{0}', '001:00:00')))
                             done()
-                        } catch (err) {
+                        } catch (err: any) {
                             done(err)
                         }
                     })
@@ -447,7 +447,7 @@ describe('RPC SERVER EVENT BUS TASK', () => {
                             expect(err.message).to.eql('Error: '.concat(Strings.ERROR_MESSAGE.TIME.INVALID_FORMAT
                                 .replace('{0}', '24:00:00')))
                             done()
-                        } catch (err) {
+                        } catch (err: any) {
                             done(err)
                         }
                     })
