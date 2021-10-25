@@ -156,8 +156,15 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 hrExpected.summary.interval = '15s'
                 hrExpected.summary.end_time = '2019-07-01T23:59:45'
                 hrExpected.data_set = buildDatasetInterval(intradayHeartRate.toJSON().data_set, '15s', TimeSeriesType.HEART_RATE)
+
+                // heart_rate - 1s
+                const hrOneSecondExpected = intradayHeartRate.toJSON()
+                hrOneSecondExpected.summary.zones = zonesExpected
+                hrOneSecondExpected.summary.interval = '1s'
+                hrOneSecondExpected.summary.end_time = '2019-07-01T23:59:45'
+                hrOneSecondExpected.data_set = buildDatasetInterval(intradayHeartRate.toJSON().data_set, '1s', TimeSeriesType.HEART_RATE)
                 expect(result[4].statusCode).to.equal(200)
-                assertTimeSeriesHeartRate(result[4].body, hrExpected)
+                assertTimeSeriesHeartRate(result[4].body, hrExpected, hrOneSecondExpected)
             })
 
             it('return status code 200 for all resource types when the time series is 1m.', async () => {
@@ -196,8 +203,15 @@ describe('CONTROLLER: intraday.timeseries', () => {
                 expected.data_set = hrDataSetMinutes
                 expected.summary.interval = '1m'
                 expected.summary.end_time = '2019-07-01T23:59:00'
+
+                // heart_rate - 1s
+                const oneSecondExpected = intradayHeartRate.toJSON()
+                oneSecondExpected.summary.zones = zonesExpected
+                oneSecondExpected.data_set = buildDatasetInterval(intradayHeartRate.toJSON().data_set, '1s', TimeSeriesType.HEART_RATE)
+                oneSecondExpected.summary.interval = '1s'
+                oneSecondExpected.summary.end_time = '2019-07-01T23:59:00'
                 expect(result[4].statusCode).to.equal(200)
-                assertTimeSeriesHeartRate(result[4].body, expected)
+                assertTimeSeriesHeartRate(result[4].body, expected, oneSecondExpected)
             })
 
             it('return status code 200 for all resource types when the time series is 15m.', async () => {
@@ -726,9 +740,9 @@ describe('CONTROLLER: intraday.timeseries', () => {
     })
 })
 
-function assertTimeSeriesHeartRate(result: any, expected: any) {
-    expect(result.summary.min).to.equal(getMin(result.data_set))
-    expect(result.summary.max).to.equal(getMax(result.data_set))
+function assertTimeSeriesHeartRate(result: any, expected: any, oneSecondExpected?: any) {
+    expect(result.summary.min).to.equal(getMin(oneSecondExpected ? oneSecondExpected.data_set : result.data_set))
+    expect(result.summary.max).to.equal(getMax(oneSecondExpected ? oneSecondExpected.data_set : result.data_set))
     expect(result.summary.average).to.equal(expected.summary.average)
     expect(result.summary.interval).to.equal(expected.summary.interval)
     expect(result.summary.start_time).to.equal(expected.summary.start_time)
