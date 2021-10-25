@@ -269,7 +269,7 @@ export class IntradayTimeSeriesRepository implements IIntradayTimeSeriesReposito
                 WHERE user_id = '${patientId}'
                 AND type = '${TimeSeriesType.HEART_RATE}'
                 AND time >= '${startTime}'
-                AND time <= '${endTime}' GROUP BY time(${interval}, ${offsetInterval}) fill(none));`,
+                AND time <= '${endTime}' GROUP BY time(1s) fill(none));`,
             `SELECT SUM(value) as value FROM ${Default.MEASUREMENT_TIMESERIES_NAME}
                 WHERE user_id = '${patientId}'
                 AND type = '${TimeSeriesType.CALORIES}'
