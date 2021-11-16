@@ -281,13 +281,9 @@ export class IntradayTimeSeriesEntityMapper implements IEntityMapper<IntradayTim
         }
         if (!dataSet.length) return result(moment(startTime), moment(endTime))
 
-        const startDate = startTime.split('T')[0]
-        const endDate = endTime.split('T')[0]
-        const _startTime = dataSet[0].time ?
-            moment(`${startDate}T${moment(dataSet[0].time.toISOString()).utc().format('HH:mm:ss')}Z`) :
-            moment(startTime)
+        const _startTime = dataSet[0].time ? moment(dataSet[0].time.toISOString()) : moment(startTime)
         const _endTime = dataSet[dataSet.length - 1].time ?
-            moment(`${endDate}T${moment(dataSet[dataSet.length - 1].time.toISOString()).utc().format('HH:mm:ss')}Z`) :
+            moment(dataSet[dataSet.length - 1].time.toISOString()) :
             moment(endTime)
 
         return result(_startTime, _endTime)
